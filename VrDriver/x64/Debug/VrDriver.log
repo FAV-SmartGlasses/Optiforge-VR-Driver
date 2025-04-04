@@ -1,6 +1,2 @@
-﻿  device_provider.cpp
-  hmd_device_driver.cpp
-  hmd_driver_factory.cpp
-  LINK : Soubor H:\Mikulas\vrDriver\VrDriver\x64\Debug\VrDriver.dll se nenašel nebo se při posledním přírůstkovém propojování nesestavil. Provádí se úplné propojení.
-     Vytváří se knihovna H:\Mikulas\vrDriver\VrDriver\x64\Debug\VrDriver.lib a objekt H:\Mikulas\vrDriver\VrDriver\x64\Debug\VrDriver.exp.
+﻿  hmd_device_driver.cpp
   VrDriver.vcxproj -> H:\Mikulas\vrDriver\VrDriver\x64\Debug\VrDriver.dll

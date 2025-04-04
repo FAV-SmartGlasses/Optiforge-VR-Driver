@@ -79,6 +79,8 @@ vr::EVRInitError MyHMDControllerDeviceDriver::Activate(uint32_t unObjectId)
 	// First, let's set the model number.
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_ModelNumber_String, my_hmd_model_number_.c_str());
 
+	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasDisplayComponent_Bool, true);
+	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasCameraComponent_Bool, true);
 	// Next, display settings
 
 	// Get the ipd of the user from SteamVR settings
@@ -86,7 +88,7 @@ vr::EVRInitError MyHMDControllerDeviceDriver::Activate(uint32_t unObjectId)
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_UserIpdMeters_Float, ipd);
 
 	// For HMDs, it's required that a refresh rate is set otherwise VRCompositor will fail to start.
-	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayFrequency_Float, 0.f);
+	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayFrequency_Float, 90.f);
 
 	// The distance from the user's eyes to the display in meters. This is used for reprojection.
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_UserHeadToEyeDepthMeters_Float, 0.f);
@@ -180,8 +182,6 @@ vr::DriverPose_t MyHMDControllerDeviceDriver::GetPose()
 
 	// For HMDs we want to apply rotation/motion prediction
 	pose.shouldApplyHeadModel = true;
-
-	DriverLog("We've set the pose");
 
 	return pose;
 }
@@ -280,7 +280,7 @@ bool MyHMDDisplayComponent::IsDisplayOnDesktop()
 //-----------------------------------------------------------------------------
 bool MyHMDDisplayComponent::IsDisplayRealDisplay()
 {
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -352,5 +352,16 @@ void MyHMDDisplayComponent::GetWindowBounds(int32_t* pnX, int32_t* pnY, uint32_t
 	*pnY = config_.window_y;
 	*pnWidth = config_.window_width;
 	*pnHeight = config_.window_height;
+}
+
+bool MyHMDDisplayComponent::ComputeInverseDistortion(vr::HmdVector2_t* pResult, vr::EVREye eEye, uint32_t unChannel, float fU, float fV)
+{
+	if (!pResult) return false;
+
+	// No distortion, so inverse is identity
+	pResult->v[0] = fU;
+	pResult->v[1] = fV;
+
+	return true;
 }
 	
