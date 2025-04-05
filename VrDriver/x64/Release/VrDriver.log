@@ -1,8 +1,0 @@
-﻿  device_provider.cpp
-  driverlog.cpp
-  hmd_device_driver.cpp
-H:\Mikulas\vrDriver\VrDriver\VrDriver\device_provider.cpp(2,10): error C1083: Nejde otevřít soubor předkompilovaná hlavička: x64\Release\VrDriver.pch: No such file or directory
-  hmd_driver_factory.cpp
-H:\Mikulas\vrDriver\VrDriver\VrDriver\driverlog.cpp(3,10): error C1083: Nejde otevřít soubor předkompilovaná hlavička: x64\Release\VrDriver.pch: No such file or directory
-H:\Mikulas\vrDriver\VrDriver\VrDriver\hmd_device_driver.cpp(3,10): error C1083: Nejde otevřít soubor předkompilovaná hlavička: x64\Release\VrDriver.pch: No such file or directory
-H:\Mikulas\vrDriver\VrDriver\VrDriver\hmd_driver_factory.cpp(2,10): error C1083: Nejde otevřít soubor předkompilovaná hlavička: x64\Release\VrDriver.pch: No such file or directory
