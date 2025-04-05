@@ -1,5 +1,4 @@
 ﻿  driver.cpp
-  driverlog.cpp
-  pch.cpp
+  LINK : Soubor H:\Mikulas\driver_optiforge\driver_optiforge\x64\Debug\driver_optiforge.dll se nenašel nebo se při posledním přírůstkovém propojování nesestavil. Provádí se úplné propojení.
      Vytváří se knihovna H:\Mikulas\driver_optiforge\driver_optiforge\x64\Debug\driver_optiforge.lib a objekt H:\Mikulas\driver_optiforge\driver_optiforge\x64\Debug\driver_optiforge.exp.
   driver_optiforge.vcxproj -> H:\Mikulas\driver_optiforge\driver_optiforge\x64\Debug\driver_optiforge.dll

@@ -1,15 +1,22 @@
-//============ Copyright (c) Valve Corporation, All rights reserved. ============
-
 #include <openvr_driver.h>
 #include "driverlog.h"
 #include "pch.h"
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <iostream>
+#include <winsock2.h>
+#include <mutex>
+
+#pragma comment(lib, "ws2_32.lib")
 
 #if defined( _WINDOWS )
 #include <windows.h>
 #endif
+
+//UDP settings
+const int PORT = 6969;
+const int BUFFER_SIZE = 16;
 
 using namespace vr;
 
@@ -141,15 +148,13 @@ void CWatchdogDriver_optiforge::Cleanup()
 	CleanupDriverLog();
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
 class CoptiforgeDeviceDriver : public vr::ITrackedDeviceServerDriver, public vr::IVRDisplayComponent
 {
 public:
 	CoptiforgeDeviceDriver()
 	{
+		memset(&serverAddr, 0, sizeof(serverAddr));
+
 		m_unObjectId = vr::k_unTrackedDeviceIndexInvalid;
 		m_ulPropertyContainer = vr::k_ulInvalidPropertyContainer;
 
@@ -183,6 +188,7 @@ public:
 
 	virtual ~CoptiforgeDeviceDriver()
 	{
+		running_ = false;
 	}
 
 	virtual bool ComputeInverseDistortion(HmdVector2_t* pResult, EVREye eEye, uint32_t unChannel, float fU, float fV) override {
@@ -200,6 +206,9 @@ public:
 
 	virtual EVRInitError Activate(vr::TrackedDeviceIndex_t unObjectId) override
 	{
+		DriverLog("Activating device %d\n", unObjectId);
+		running_ = true;
+
 		m_unObjectId = unObjectId;
 		m_ulPropertyContainer = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_unObjectId);
 
@@ -255,13 +264,49 @@ public:
 			vr::VRProperties()->SetStringProperty(m_ulPropertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, "{optiforge}/icons/headset_optiforge_status_standby.png");
 			vr::VRProperties()->SetStringProperty(m_ulPropertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{optiforge}/icons/headset_optiforge_status_ready_low.png");
 		}
+		
+		wsaInit_ = WSAStartup(MAKEWORD(2, 2), &wsaData_);
+		if (wsaInit_ != 0) {
+			DriverLog("WSAStartup failed: %d", wsaInit_);
+		}
+		DriverLog("WSAStartup successful\n");
+
+		serverAddr.sin_family = AF_INET;
+		serverAddr.sin_port = htons(PORT);
+		serverAddr.sin_addr.s_addr = INADDR_ANY;
+
+		// Create UDP socket
+		sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if (sock_ == INVALID_SOCKET) {
+			DriverLog("Socket creation failed: %d", WSAGetLastError());
+			WSACleanup();
+			return vr::VRInitError_Driver_Failed;
+		}
+		DriverLog("Socket created successfully\n");
+
+		// Bind the socket
+		if (bind(sock_, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+			DriverLog("Bind failed: %d", WSAGetLastError());
+			closesocket(sock_);
+			WSACleanup();
+			return vr::VRInitError_Driver_Failed;
+		}
+
+		DriverLog("Listening on port %d", PORT);
+
+		// Start the UDP thread
+		std::thread udpThread(&CoptiforgeDeviceDriver::UDPThread, this);
+		udpThread.detach(); // Detach the thread to run independently
 
 		return VRInitError_None;
 	}
 
 	virtual void Deactivate() override
 	{
+		running_ = false;
 		m_unObjectId = vr::k_unTrackedDeviceIndexInvalid;
+		closesocket(sock_);
+		WSACleanup();
 	}
 
 	virtual void EnterStandby() override
@@ -361,10 +406,16 @@ public:
 		pose.qWorldFromDriverRotation.w = 1.f;
 		pose.qDriverFromHeadRotation.w = 1.f;
 
-		pose.qRotation.w = 1.f;
+		{
+			std::lock_guard<std::mutex> lock(quatMutex); // Scoped lock for thread safety
+			pose.qRotation.x = quat[0];
+			pose.qRotation.y = quat[1];
+			pose.qRotation.z = quat[2];
+			pose.qRotation.w = quat[3];
+		}
 
 		pose.vecPosition[0] = 0.0f;
-		pose.vecPosition[1] = sin(frame_number_ * 0.01) * 0.1f + 1.0f; // slowly move the hmd up and down.
+		pose.vecPosition[1] = 1.7;
 		pose.vecPosition[2] = 0.0f;
 
 		// The pose we provided is valid.
@@ -387,6 +438,21 @@ public:
 		return pose;
 	}
 
+	void UDPThread() {
+		while (running_) {
+			char buffer[BUFFER_SIZE];
+			sockaddr_in clientAddr{};
+			int clientAddrSize = sizeof(clientAddr);
+
+			int received = recvfrom(sock_, buffer, BUFFER_SIZE, 0,
+				(SOCKADDR*)&clientAddr, &clientAddrSize);
+
+			if (received == BUFFER_SIZE) {
+				std::lock_guard<std::mutex> lock(quatMutex);
+				memcpy(quat, buffer, BUFFER_SIZE);
+			}
+		}
+	}
 
 	void RunFrame()
 	{
@@ -420,7 +486,17 @@ private:
 	float m_flDisplayFrequency;
 	float m_flIPD;
 
+	bool running_ = false;
 	int frame_number_ = 0;
+
+	float quat[4] = { 0.0, 0.0, 0.0, 1.0 };
+	std::mutex quatMutex;
+
+	WSADATA wsaData_;
+	int wsaInit_;
+	SOCKET sock_;
+
+	sockaddr_in serverAddr{};
 };
 
 //-----------------------------------------------------------------------------
