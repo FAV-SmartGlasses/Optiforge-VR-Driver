@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2b97ecf0-198c-4a11-8769-4335ce59f2d3" name="Changes" comment="Added UDP receiving thread" />
+    <list default="true" id="2b97ecf0-198c-4a11-8769-4335ce59f2d3" name="Changes" comment="Updated README.md to say the locations because I will likely forget it" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -81,13 +81,22 @@
       <option name="project" value="LOCAL" />
       <updated>1743876772169</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Updated README.md to say the locations because I will likely forget it">
+      <option name="closed" value="true" />
+      <created>1743882257840</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1743882257840</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Completely changed EVERYTHING" />
     <MESSAGE value="Removed .dll from .gitignore" />
     <MESSAGE value="Added UDP receiving thread" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added UDP receiving thread" />
+    <MESSAGE value="Updated README.md to say the locations because I will likely forget it" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated README.md to say the locations because I will likely forget it" />
   </component>
 </project>
