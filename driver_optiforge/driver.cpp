@@ -7,6 +7,8 @@
 #include <iostream>
 #include <winsock2.h>
 #include <mutex>
+#include <tchar.h>
+#include <ws2tcpip.h>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -14,8 +16,7 @@
 #include <windows.h>
 #endif
 
-//UDP settings
-const int PORT = 6969;
+//TCP/IP settings
 const int BUFFER_SIZE = 16;
 
 using namespace vr;
@@ -70,6 +71,8 @@ static const char* const k_pch_optiforge_RenderWidth_Int32 = "renderWidth";
 static const char* const k_pch_optiforge_RenderHeight_Int32 = "renderHeight";
 static const char* const k_pch_optiforge_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
 static const char* const k_pch_optiforge_DisplayFrequency_Float = "displayFrequency";
+static const char* const k_pch_optiforge_IP = "ip";
+static const char* const k_pch_optiforge_Port = "port";
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -176,14 +179,18 @@ public:
 		m_nRenderHeight = vr::VRSettings()->GetInt32(k_pch_optiforge_Section, k_pch_optiforge_RenderHeight_Int32);
 		m_flSecondsFromVsyncToPhotons = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_SecondsFromVsyncToPhotons_Float);
 		m_flDisplayFrequency = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_DisplayFrequency_Float);
+		PORT = vr::VRSettings()->GetInt32(k_pch_optiforge_Section, k_pch_optiforge_Port);
 
-		DriverLog("driver_null: Serial Number: %s\n", m_sSerialNumber.c_str());
-		DriverLog("driver_null: Model Number: %s\n", m_sModelNumber.c_str());
-		DriverLog("driver_null: Window: %d %d %d %d\n", m_nWindowX, m_nWindowY, m_nWindowWidth, m_nWindowHeight);
-		DriverLog("driver_null: Render Target: %d %d\n", m_nRenderWidth, m_nRenderHeight);
-		DriverLog("driver_null: Seconds from Vsync to Photons: %f\n", m_flSecondsFromVsyncToPhotons);
-		DriverLog("driver_null: Display Frequency: %f\n", m_flDisplayFrequency);
-		DriverLog("driver_null: IPD: %f\n", m_flIPD);
+		vr::VRSettings()->GetString(k_pch_optiforge_Section, k_pch_optiforge_IP, buf, sizeof(buf));
+		IP = buf;
+
+		DriverLog("driver_optiforge: Serial Number: %s\n", m_sSerialNumber.c_str());
+		DriverLog("driver_optiforge: Model Number: %s\n", m_sModelNumber.c_str());
+		DriverLog("driver_optiforge: Window: %d %d %d %d\n", m_nWindowX, m_nWindowY, m_nWindowWidth, m_nWindowHeight);
+		DriverLog("driver_optiforge: Render Target: %d %d\n", m_nRenderWidth, m_nRenderHeight);
+		DriverLog("driver_optiforge: Seconds from Vsync to Photons: %f\n", m_flSecondsFromVsyncToPhotons);
+		DriverLog("driver_optiforge: Display Frequency: %f\n", m_flDisplayFrequency);
+		DriverLog("driver_optiforge: IPD: %f\n", m_flIPD);
 	}
 
 	virtual ~CoptiforgeDeviceDriver()
@@ -227,29 +234,6 @@ public:
 		// avoid "not fullscreen" warnings from vrmonitor
 		vr::VRProperties()->SetBoolProperty(m_ulPropertyContainer, Prop_IsOnDesktop_Bool, false);
 
-		// Icons can be configured in code or automatically configured by an external file "drivername\resources\driver.vrresources".
-		// Icon properties NOT configured in code (post Activate) are then auto-configured by the optional presence of a driver's "drivername\resources\driver.vrresources".
-		// In this manner a driver can configure their icons in a flexible data driven fashion by using an external file.
-		//
-		// The structure of the driver.vrresources file allows a driver to specialize their icons based on their HW.
-		// Keys matching the value in "Prop_ModelNumber_String" are considered first, since the driver may have model specific icons.
-		// An absence of a matching "Prop_ModelNumber_String" then considers the ETrackedDeviceClass ("HMD", "Controller", "GenericTracker", "TrackingReference")
-		// since the driver may have specialized icons based on those device class names.
-		//
-		// An absence of either then falls back to the "system.vrresources" where generic device class icons are then supplied.
-		//
-		// Please refer to "bin\drivers\optiforge\resources\driver.vrresources" which contains this optiforge configuration.
-		//
-		// "Alias" is a reserved key and specifies chaining to another json block.
-		//
-		// In this optiforge configuration file (overly complex FOR EXAMPLE PURPOSES ONLY)....
-		//
-		// "Model-v2.0" chains through the alias to "Model-v1.0" which chains through the alias to "Model-v Defaults".
-		//
-		// Keys NOT found in "Model-v2.0" would then chase through the "Alias" to be resolved in "Model-v1.0" and either resolve their or continue through the alias.
-		// Thus "Prop_NamedIconPathDeviceAlertLow_String" in each model's block represent a specialization specific for that "model".
-		// Keys in "Model-v Defaults" are an example of mapping to the same states, and here all map to "Prop_NamedIconPathDeviceOff_String".
-		//
 		bool bSetupIconUsingExternalResourceFile = false;
 		if (!bSetupIconUsingExternalResourceFile)
 		{
@@ -273,19 +257,21 @@ public:
 
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(PORT);
-		serverAddr.sin_addr.s_addr = INADDR_ANY;
+		inet_pton(AF_INET, IP.c_str(), &serverAddr.sin_addr); // <-- Replace with your server's public IP
 
 		// Create UDP socket
-		sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
 		if (sock_ == INVALID_SOCKET) {
 			DriverLog("Socket creation failed: %d", WSAGetLastError());
 			WSACleanup();
 			return vr::VRInitError_Driver_Failed;
 		}
+
 		DriverLog("Socket created successfully\n");
 
 		// Bind the socket
-		if (bind(sock_, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+		if (connect(sock_, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
 			DriverLog("Bind failed: %d", WSAGetLastError());
 			closesocket(sock_);
 			WSACleanup();
@@ -295,7 +281,7 @@ public:
 		DriverLog("Listening on port %d", PORT);
 
 		// Start the UDP thread
-		std::thread udpThread(&CoptiforgeDeviceDriver::UDPThread, this);
+		std::thread udpThread(&CoptiforgeDeviceDriver::TCPThread, this);
 		udpThread.detach(); // Detach the thread to run independently
 
 		return VRInitError_None;
@@ -438,18 +424,24 @@ public:
 		return pose;
 	}
 
-	void UDPThread() {
+	void TCPThread() {
 		while (running_) {
 			char buffer[BUFFER_SIZE];
-			sockaddr_in clientAddr{};
-			int clientAddrSize = sizeof(clientAddr);
 
-			int received = recvfrom(sock_, buffer, BUFFER_SIZE, 0,
-				(SOCKADDR*)&clientAddr, &clientAddrSize);
+			// Receive data from the socket
+			int received = recv(sock_, buffer, BUFFER_SIZE, 0);
 
+			if (received == SOCKET_ERROR) {
+				DriverLog("Receive failed: %d", WSAGetLastError());
+				continue;
+			}
+			
 			if (received == BUFFER_SIZE) {
-				std::lock_guard<std::mutex> lock(quatMutex);
+				std::lock_guard<std::mutex> lock(quatMutex);  // Ensure thread safety
 				memcpy(quat, buffer, BUFFER_SIZE);
+			}
+			else {
+				DriverLog("Unexpected data size");
 			}
 		}
 	}
@@ -495,6 +487,9 @@ private:
 	WSADATA wsaData_;
 	int wsaInit_;
 	SOCKET sock_;
+
+	int PORT = 31000;
+	std::string IP;
 
 	sockaddr_in serverAddr{};
 };

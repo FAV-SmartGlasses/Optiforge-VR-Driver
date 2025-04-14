@@ -11,6 +11,8 @@
         "renderWidth": 1512,
         "renderHeight": 1680,
         "secondsFromVsyncToPhotons": 0.01111111,
-        "displayFrequency": 90.0
+        "displayFrequency": 90.0,
+        "ip": "192.168.0.121",
+        "port": 31000
     }
 }
