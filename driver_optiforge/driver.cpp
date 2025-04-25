@@ -255,6 +255,19 @@ public:
 		}
 		DriverLog("WSAStartup successful\n");
 
+		if (!Connect()) {
+			return vr::VRInitError_Driver_Failed;
+		}
+
+		// Start the UDP thread
+		std::thread udpThread(&CoptiforgeDeviceDriver::TCPThread, this);
+		udpThread.detach(); // Detach the thread to run independently
+
+		return VRInitError_None;
+	}
+
+	bool Connect() {
+		timeout = 0;
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(PORT);
 		inet_pton(AF_INET, IP.c_str(), &serverAddr.sin_addr); // <-- Replace with your server's public IP
@@ -265,7 +278,7 @@ public:
 		if (sock_ == INVALID_SOCKET) {
 			DriverLog("Socket creation failed: %d", WSAGetLastError());
 			WSACleanup();
-			return vr::VRInitError_Driver_Failed;
+			return false;
 		}
 
 		DriverLog("Socket created successfully\n");
@@ -275,16 +288,11 @@ public:
 			DriverLog("Bind failed: %d", WSAGetLastError());
 			closesocket(sock_);
 			WSACleanup();
-			return vr::VRInitError_Driver_Failed;
+			return false;
 		}
 
 		DriverLog("Listening on port %d", PORT);
-
-		// Start the UDP thread
-		std::thread udpThread(&CoptiforgeDeviceDriver::TCPThread, this);
-		udpThread.detach(); // Detach the thread to run independently
-
-		return VRInitError_None;
+		return true;
 	}
 
 	virtual void Deactivate() override
@@ -297,6 +305,7 @@ public:
 
 	virtual void EnterStandby() override
 	{
+		DriverLog("Entering standby");
 	}
 
 	void* GetComponent(const char* pchComponentNameAndVersion) override
@@ -441,6 +450,13 @@ public:
 				memcpy(quat, buffer, BUFFER_SIZE);
 			}
 			else {
+				if (timeout > 10) {
+					closesocket(sock_);
+					Connect();
+				}
+
+				timeout++;
+
 				DriverLog("Unexpected data size");
 			}
 		}
@@ -492,6 +508,8 @@ private:
 	std::string IP;
 
 	sockaddr_in serverAddr{};
+
+	int timeout = 0;
 };
 
 //-----------------------------------------------------------------------------
