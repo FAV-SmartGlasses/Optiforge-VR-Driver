@@ -1,5 +1,5 @@
-﻿// pch.cpp: zdrojový soubor odpovídající předkompilované hlavičce
+﻿// pch.cpp: source file corresponding to the precompiled header
 
 #include "pch.h"
 
-// K tomu, aby byla při použití předkompilovaných hlaviček kompilace úspěšná, je nezbytný tento zdrojový soubor.
+// This source file is required for the build to succeed when using precompiled headers.

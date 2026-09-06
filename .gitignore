@@ -1,3 +1,7 @@
+# Project folders
+build
+.idea
+
 # Prerequisites
 *.d
 
@@ -12,7 +16,6 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.so
 *.dylib
 
 # Fortran module files

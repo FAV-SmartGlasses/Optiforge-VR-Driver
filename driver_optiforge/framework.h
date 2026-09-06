@@ -1,5 +1,7 @@
 ﻿#pragma once
 
-#define WIN32_LEAN_AND_MEAN             // Vyloučit málo používané položky z hlavičkových souborů Windows
-// Hlavičkové soubory Windows
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used items from Windows headers
+// Windows header files
 #include <windows.h>
+#endif

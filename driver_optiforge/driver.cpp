@@ -5,15 +5,36 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-#include <winsock2.h>
 #include <mutex>
-#include <tchar.h>
-#include <ws2tcpip.h>
+#include <cstring>
 
-#pragma comment(lib, "ws2_32.lib")
-
-#if defined( _WINDOWS )
+#if defined( _WIN32 )
 #include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <errno.h>
+
+// Minimal shims so the rest of the file can use the Winsock-style names
+// on both platforms.
+typedef int SOCKET;
+typedef struct sockaddr SOCKADDR;
+static const int INVALID_SOCKET = -1;
+static const int SOCKET_ERROR = -1;
+#define closesocket close
+#define WSAGetLastError() errno
+#define WSACleanup()
+#endif
+
+#if defined( _WIN32 )
+#define strcasecmp_portable _stricmp
+#else
+#define strcasecmp_portable strcasecmp
 #endif
 
 //TCP/IP settings
@@ -102,7 +123,7 @@ void WatchdogThreadFunction()
 {
 	while (!g_bExiting)
 	{
-#if defined( _WINDOWS )
+#if defined( _WIN32 )
 		// on windows send the event when the Y key is pressed.
 		if ((0x01 & GetAsyncKeyState('Y')) != 0)
 		{
@@ -249,11 +270,13 @@ public:
 			vr::VRProperties()->SetStringProperty(m_ulPropertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{optiforge}/icons/headset_optiforge_status_ready_low.png");
 		}
 		
+#if defined( _WIN32 )
 		wsaInit_ = WSAStartup(MAKEWORD(2, 2), &wsaData_);
 		if (wsaInit_ != 0) {
 			DriverLog("WSAStartup failed: %d", wsaInit_);
 		}
 		DriverLog("WSAStartup successful\n");
+#endif
 
 		if (!Connect()) {
 			return vr::VRInitError_Driver_Failed;
@@ -310,7 +333,7 @@ public:
 
 	void* GetComponent(const char* pchComponentNameAndVersion) override
 	{
-		if (!_stricmp(pchComponentNameAndVersion, vr::IVRDisplayComponent_Version))
+		if (!strcasecmp_portable(pchComponentNameAndVersion, vr::IVRDisplayComponent_Version))
 		{
 			return (vr::IVRDisplayComponent*)this;
 		}
@@ -500,8 +523,10 @@ private:
 	float quat[4] = { 0.0, 0.0, 0.0, 1.0 };
 	std::mutex quatMutex;
 
+#if defined( _WIN32 )
 	WSADATA wsaData_;
 	int wsaInit_;
+#endif
 	SOCKET sock_;
 
 	int PORT = 31000;
@@ -610,7 +635,7 @@ public:
 
 	void RunFrame()
 	{
-#if defined( _WINDOWS )
+#if defined( _WIN32 )
 		// Your driver would read whatever hardware state is associated with its input components and pass that
 		// in to UpdateBooleanComponent. This could happen in RunFrame or on a thread of your own that's reading USB
 		// state. There's no need to update input state unless it changes, but it doesn't do any harm to do so.
