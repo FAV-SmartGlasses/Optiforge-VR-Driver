@@ -7,6 +7,7 @@
 #include <iostream>
 #include <mutex>
 #include <cstring>
+#include <cmath>
 
 #if defined( _WIN32 )
 #include <windows.h>
@@ -63,6 +64,61 @@ inline HmdQuaternion_t HmdQuaternion_Init(double w, double x, double y, double z
 	return quat;
 }
 
+inline HmdQuaternion_t HmdQuaternion_Multiply(const HmdQuaternion_t& a, const HmdQuaternion_t& b)
+{
+	return HmdQuaternion_Init(
+		a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+		a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+		a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+		a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w);
+}
+
+inline HmdQuaternion_t HmdQuaternion_FromAxisAngle(double x, double y, double z, double angle)
+{
+	double s = sin(angle / 2.0);
+	return HmdQuaternion_Init(cos(angle / 2.0), x * s, y * s, z * s);
+}
+
+// Rotation part of a 3x4 row-major pose matrix to a quaternion
+inline HmdQuaternion_t HmdQuaternion_FromMatrix(const HmdMatrix34_t& m)
+{
+	HmdQuaternion_t q;
+	double trace = m.m[0][0] + m.m[1][1] + m.m[2][2];
+	if (trace > 0.0)
+	{
+		double s = 0.5 / sqrt(trace + 1.0);
+		q.w = 0.25 / s;
+		q.x = (m.m[2][1] - m.m[1][2]) * s;
+		q.y = (m.m[0][2] - m.m[2][0]) * s;
+		q.z = (m.m[1][0] - m.m[0][1]) * s;
+	}
+	else if (m.m[0][0] > m.m[1][1] && m.m[0][0] > m.m[2][2])
+	{
+		double s = 2.0 * sqrt(1.0 + m.m[0][0] - m.m[1][1] - m.m[2][2]);
+		q.w = (m.m[2][1] - m.m[1][2]) / s;
+		q.x = 0.25 * s;
+		q.y = (m.m[0][1] + m.m[1][0]) / s;
+		q.z = (m.m[0][2] + m.m[2][0]) / s;
+	}
+	else if (m.m[1][1] > m.m[2][2])
+	{
+		double s = 2.0 * sqrt(1.0 + m.m[1][1] - m.m[0][0] - m.m[2][2]);
+		q.w = (m.m[0][2] - m.m[2][0]) / s;
+		q.x = (m.m[0][1] + m.m[1][0]) / s;
+		q.y = 0.25 * s;
+		q.z = (m.m[1][2] + m.m[2][1]) / s;
+	}
+	else
+	{
+		double s = 2.0 * sqrt(1.0 + m.m[2][2] - m.m[0][0] - m.m[1][1]);
+		q.w = (m.m[1][0] - m.m[0][1]) / s;
+		q.x = (m.m[0][2] + m.m[2][0]) / s;
+		q.y = (m.m[1][2] + m.m[2][1]) / s;
+		q.z = 0.25 * s;
+	}
+	return q;
+}
+
 inline void HmdMatrix_SetIdentity(HmdMatrix34_t* pMatrix)
 {
 	pMatrix->m[0][0] = 1.f;
@@ -94,6 +150,15 @@ static const char* const k_pch_optiforge_SecondsFromVsyncToPhotons_Float = "seco
 static const char* const k_pch_optiforge_DisplayFrequency_Float = "displayFrequency";
 static const char* const k_pch_optiforge_IP = "ip";
 static const char* const k_pch_optiforge_Port = "port";
+static const char* const k_pch_optiforge_TrackerSerial_String = "trackerSerial";
+static const char* const k_pch_optiforge_TrackerOffsetX_Float = "trackerOffsetX";
+static const char* const k_pch_optiforge_TrackerOffsetY_Float = "trackerOffsetY";
+static const char* const k_pch_optiforge_TrackerOffsetZ_Float = "trackerOffsetZ";
+static const char* const k_pch_optiforge_TrackerYaw_Float = "trackerYaw";
+static const char* const k_pch_optiforge_TrackerPitch_Float = "trackerPitch";
+static const char* const k_pch_optiforge_TrackerRoll_Float = "trackerRoll";
+
+static const double k_flDegToRad = 3.14159265358979323846 / 180.0;
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -205,6 +270,23 @@ public:
 		vr::VRSettings()->GetString(k_pch_optiforge_Section, k_pch_optiforge_IP, buf, sizeof(buf));
 		IP = buf;
 
+		// Lighthouse tag mounted on the headset. Empty serial = use the first generic tracker found.
+		vr::VRSettings()->GetString(k_pch_optiforge_Section, k_pch_optiforge_TrackerSerial_String, buf, sizeof(buf));
+		m_sTagSerial = buf;
+
+		// Transform from the tag to the head (centre between the eyes), expressed in the tag's own axes
+		m_vecTagToHead[0] = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerOffsetX_Float);
+		m_vecTagToHead[1] = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerOffsetY_Float);
+		m_vecTagToHead[2] = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerOffsetZ_Float);
+		float flYaw = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerYaw_Float);
+		float flPitch = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerPitch_Float);
+		float flRoll = vr::VRSettings()->GetFloat(k_pch_optiforge_Section, k_pch_optiforge_TrackerRoll_Float);
+		m_qTagToHead = HmdQuaternion_Multiply(
+			HmdQuaternion_Multiply(
+				HmdQuaternion_FromAxisAngle(0, 1, 0, flYaw * k_flDegToRad),
+				HmdQuaternion_FromAxisAngle(1, 0, 0, flPitch * k_flDegToRad)),
+			HmdQuaternion_FromAxisAngle(0, 0, 1, flRoll * k_flDegToRad));
+
 		DriverLog("driver_optiforge: Serial Number: %s\n", m_sSerialNumber.c_str());
 		DriverLog("driver_optiforge: Model Number: %s\n", m_sModelNumber.c_str());
 		DriverLog("driver_optiforge: Window: %d %d %d %d\n", m_nWindowX, m_nWindowY, m_nWindowWidth, m_nWindowHeight);
@@ -212,6 +294,9 @@ public:
 		DriverLog("driver_optiforge: Seconds from Vsync to Photons: %f\n", m_flSecondsFromVsyncToPhotons);
 		DriverLog("driver_optiforge: Display Frequency: %f\n", m_flDisplayFrequency);
 		DriverLog("driver_optiforge: IPD: %f\n", m_flIPD);
+		DriverLog("driver_optiforge: Tracker serial: %s\n", m_sTagSerial.empty() ? "(first generic tracker)" : m_sTagSerial.c_str());
+		DriverLog("driver_optiforge: Tracker offset: %f %f %f, rotation (yaw pitch roll): %f %f %f\n",
+			m_vecTagToHead[0], m_vecTagToHead[1], m_vecTagToHead[2], flYaw, flPitch, flRoll);
 	}
 
 	virtual ~CoptiforgeDeviceDriver()
@@ -250,7 +335,8 @@ public:
 		vr::VRProperties()->SetBoolProperty(m_ulPropertyContainer, Prop_DisplayDebugMode_Bool, true);
 
 		// return a constant that's not 0 (invalid) or 1 (reserved for Oculus)
-		vr::VRProperties()->SetUint64Property(m_ulPropertyContainer, Prop_CurrentUniverseId_Uint64, 2);
+		// Replaced with the lighthouse universe once the tag is found, see UpdateTag()
+		vr::VRProperties()->SetUint64Property(m_ulPropertyContainer, Prop_CurrentUniverseId_Uint64, m_ulUniverseId);
 
 		// avoid "not fullscreen" warnings from vrmonitor
 		vr::VRProperties()->SetBoolProperty(m_ulPropertyContainer, Prop_IsOnDesktop_Bool, false);
@@ -269,7 +355,9 @@ public:
 			vr::VRProperties()->SetStringProperty(m_ulPropertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, "{optiforge}/icons/headset_optiforge_status_standby.png");
 			vr::VRProperties()->SetStringProperty(m_ulPropertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{optiforge}/icons/headset_optiforge_status_ready_low.png");
 		}
-		
+
+		// RPi IMU connection, disabled while rotation comes from the lighthouse tag
+		/*
 #if defined( _WIN32 )
 		wsaInit_ = WSAStartup(MAKEWORD(2, 2), &wsaData_);
 		if (wsaInit_ != 0) {
@@ -285,6 +373,7 @@ public:
 		// Start the UDP thread
 		std::thread udpThread(&CoptiforgeDeviceDriver::TCPThread, this);
 		udpThread.detach(); // Detach the thread to run independently
+		*/
 
 		return VRInitError_None;
 	}
@@ -322,8 +411,9 @@ public:
 	{
 		running_ = false;
 		m_unObjectId = vr::k_unTrackedDeviceIndexInvalid;
-		closesocket(sock_);
-		WSACleanup();
+		// RPi IMU connection, disabled while rotation comes from the lighthouse tag
+		//closesocket(sock_);
+		//WSACleanup();
 	}
 
 	virtual void EnterStandby() override
@@ -422,8 +512,15 @@ public:
 
 		// These need to be set to be valid quaternions. The device won't appear otherwise.
 		pose.qWorldFromDriverRotation.w = 1.f;
-		pose.qDriverFromHeadRotation.w = 1.f;
 
+		// The "driver" pose is the tag's pose; this is the mounting transform from the tag to the head
+		pose.qDriverFromHeadRotation = m_qTagToHead;
+		pose.vecDriverFromHeadTranslation[0] = m_vecTagToHead[0];
+		pose.vecDriverFromHeadTranslation[1] = m_vecTagToHead[1];
+		pose.vecDriverFromHeadTranslation[2] = m_vecTagToHead[2];
+
+		// Rotation from the RPi IMU, disabled while rotation comes from the lighthouse tag
+		/*
 		{
 			std::lock_guard<std::mutex> lock(quatMutex); // Scoped lock for thread safety
 			pose.qRotation.x = quat[0];
@@ -431,29 +528,106 @@ public:
 			pose.qRotation.z = quat[2];
 			pose.qRotation.w = quat[3];
 		}
+		*/
 
-		pose.vecPosition[0] = 0.0f;
-		pose.vecPosition[1] = 1.7;
-		pose.vecPosition[2] = 0.0f;
+		if (m_bHasTagPose)
+		{
+			const HmdMatrix34_t& m = m_tagPose.mDeviceToAbsoluteTracking;
+			pose.qRotation = HmdQuaternion_FromMatrix(m);
+			pose.vecPosition[0] = m.m[0][3];
+			pose.vecPosition[1] = m.m[1][3];
+			pose.vecPosition[2] = m.m[2][3];
 
-		// The pose we provided is valid.
-		// This should be set is
-		pose.poseIsValid = true;
+			// Only pass velocities while tracking, so a held pose doesn't get extrapolated away
+			if (m_bTagTracking)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					pose.vecVelocity[i] = m_tagPose.vVelocity.v[i];
+					pose.vecAngularVelocity[i] = m_tagPose.vAngularVelocity.v[i];
+				}
+			}
 
-		// Our device is always connected.
-		// In reality with physical devices, when they get disconnected,
-		// set this to false and icons in SteamVR will be updated to show the device is disconnected
+			pose.poseIsValid = true;
+
+			// When the tag loses tracking we hold its last good pose, but let SteamVR know
+			pose.result = m_bTagTracking ? vr::TrackingResult_Running_OK : vr::TrackingResult_Running_OutOfRange;
+		}
+		else
+		{
+			// Tag not seen yet
+			pose.qRotation.w = 1.f;
+			pose.poseIsValid = false;
+			pose.result = vr::TrackingResult_Uninitialized;
+		}
+
 		pose.deviceIsConnected = true;
 
-		// The state of our tracking. For our virtual device, it's always going to be ok,
-		// but this can get set differently to inform the runtime about the state of the device's tracking
-		// and update the icons to inform the user accordingly.
-		pose.result = vr::TrackingResult_Running_OK;
-
-		// For HMDs we want to apply rotation/motion prediction
-		pose.shouldApplyHeadModel = true;
+		// Position is tracked, so no neck model
+		pose.shouldApplyHeadModel = false;
 
 		return pose;
+	}
+
+	// Looks for the lighthouse tag among the tracked devices, returns true when found
+	bool FindTag()
+	{
+		for (vr::TrackedDeviceIndex_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
+		{
+			if (i == m_unObjectId)
+				continue;
+
+			vr::PropertyContainerHandle_t container = vr::VRProperties()->TrackedDeviceToPropertyContainer(i);
+			if (container == vr::k_ulInvalidPropertyContainer)
+				continue;
+
+			vr::ETrackedPropertyError err;
+			int32_t deviceClass = vr::VRProperties()->GetInt32Property(container, Prop_DeviceClass_Int32, &err);
+			if (err != vr::TrackedProp_Success || deviceClass != vr::TrackedDeviceClass_GenericTracker)
+				continue;
+
+			std::string serial = vr::VRProperties()->GetStringProperty(container, Prop_SerialNumber_String, &err);
+			if (err != vr::TrackedProp_Success || (!m_sTagSerial.empty() && serial != m_sTagSerial))
+				continue;
+
+			m_unTagId = i;
+			DriverLog("driver_optiforge: Using tracker %s (device %d)\n", serial.c_str(), i);
+			return true;
+		}
+		return false;
+	}
+
+	// Reads the tag's current pose and keeps our universe in sync with the lighthouse one
+	void UpdateTag()
+	{
+		if (m_unTagId == vr::k_unTrackedDeviceIndexInvalid)
+		{
+			// Searching every frame is wasteful, once a second is plenty
+			if (frame_number_ % 90 != 0 || !FindTag())
+				return;
+		}
+
+		vr::TrackedDevicePose_t poses[vr::k_unMaxTrackedDeviceCount];
+		vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0.f, poses, vr::k_unMaxTrackedDeviceCount);
+
+		const vr::TrackedDevicePose_t& tag = poses[m_unTagId];
+		m_bTagTracking = tag.bDeviceIsConnected && tag.bPoseIsValid && tag.eTrackingResult == vr::TrackingResult_Running_OK;
+		if (m_bTagTracking)
+		{
+			m_tagPose = tag;
+			m_bHasTagPose = true;
+		}
+
+		// Our pose is in the lighthouse tracking space, so we have to be in the same universe
+		vr::ETrackedPropertyError err;
+		vr::PropertyContainerHandle_t tagContainer = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_unTagId);
+		uint64_t universe = vr::VRProperties()->GetUint64Property(tagContainer, Prop_CurrentUniverseId_Uint64, &err);
+		if (err == vr::TrackedProp_Success && universe != 0 && universe != m_ulUniverseId)
+		{
+			m_ulUniverseId = universe;
+			vr::VRProperties()->SetUint64Property(m_ulPropertyContainer, Prop_CurrentUniverseId_Uint64, m_ulUniverseId);
+			DriverLog("driver_optiforge: Switched to universe %llu\n", (unsigned long long)m_ulUniverseId);
+		}
 	}
 
 	void TCPThread() {
@@ -494,6 +668,7 @@ public:
 		// driver blocks it for some periodic task.
 		if (m_unObjectId != vr::k_unTrackedDeviceIndexInvalid)
 		{
+			UpdateTag();
 			vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_unObjectId, GetPose(), sizeof(DriverPose_t));
 		}
 	}
@@ -522,6 +697,16 @@ private:
 
 	float quat[4] = { 0.0, 0.0, 0.0, 1.0 };
 	std::mutex quatMutex;
+
+	// Lighthouse tag used for the headset's pose
+	std::string m_sTagSerial;
+	vr::TrackedDeviceIndex_t m_unTagId = vr::k_unTrackedDeviceIndexInvalid;
+	vr::TrackedDevicePose_t m_tagPose{};
+	bool m_bHasTagPose = false;
+	bool m_bTagTracking = false;
+	HmdQuaternion_t m_qTagToHead = { 1, 0, 0, 0 };
+	double m_vecTagToHead[3] = { 0, 0, 0 };
+	uint64_t m_ulUniverseId = 2;
 
 #if defined( _WIN32 )
 	WSADATA wsaData_;

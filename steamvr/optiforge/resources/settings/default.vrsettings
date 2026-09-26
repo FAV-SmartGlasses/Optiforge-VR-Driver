@@ -13,6 +13,13 @@
         "secondsFromVsyncToPhotons": 0.01111111,
         "displayFrequency": 90.0,
         "ip": "127.0.0.1",
-        "port": 31000
+        "port": 31000,
+        "trackerSerial": "",
+        "trackerOffsetX": 0.0,
+        "trackerOffsetY": 0.0,
+        "trackerOffsetZ": 0.0,
+        "trackerYaw": 0.0,
+        "trackerPitch": 0.0,
+        "trackerRoll": 0.0
     }
 }

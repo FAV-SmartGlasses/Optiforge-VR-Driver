@@ -1,5 +1,6 @@
 # Project folders
 build
+build-win
 .idea
 
 # Prerequisites
