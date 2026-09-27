@@ -1,0 +1,94 @@
+Optiforge VR driver - Linux VR context (updated 2026-09-26, evening)
+====================================================================
+
+GOAL
+----
+Event showcase on LINUX ONLY (user will not use Windows). Needs: custom headset
+(Waveshare panel) with image output, head pose from a Vive tracker via
+lighthouse base stations. Content should be slow/calm (no Beat Saber style),
+e.g. a simple look-around scene.
+
+HARDWARE / SYSTEM
+-----------------
+- Laptop, EndeavourOS (Arch), kernel 6.18 LTS, package managers: pacman + yay
+- GPU: NVIDIA Quadro M2000M (Maxwell), proprietary driver 580.x
+  (580 is the last branch supporting Maxwell). Weak GPU: SteamVR measured
+  ~90 MP/s vs ~304 MP/s requested -> keep render resolution / scenes light.
+- Desktop: KDE Plasma 6, used the "Plasma (X11)" session
+- Laptop panel: DP-3, 3840x2160 (primary)
+- Headset panel: Waveshare, EDID "HLT 13363" (vendor HLT, product 0x3433),
+  1080x1920 portrait, ~59.99 Hz. Connector name changes between boots
+  (seen as DP-1, DP-2). Find it with: xrandr | grep " connected"  (1080x1920 one)
+- Lighthouse: Watchman dongle 28DE:2101 s/n F57A5E3535 detected fine
+- SteamVR 2.17.10 at ~/.local/share/Steam/steamapps/common/SteamVR
+
+STEAMVR ON LINUX - DEAD END
+---------------------------
+- The optiforge SteamVR driver loads and the HMD activates fine (vrserver.txt).
+- Linux vrcompositor ALWAYS requires direct mode ("VR requires direct mode"),
+  regardless of IsDisplayOnDesktop(). No extended/desktop-window mode on Linux.
+  IVRDriverDirectModeComponent uses D3D shared handles -> Windows only.
+- With the panel marked non-desktop
+  (xrandr --output DP-1 --set non-desktop 1 ; resets on logout, undo with 0)
+  the lease WORKS ("Acquired xlib display!", "Headset is using direct mode"),
+  but vrcompositor then crashes the GPU:
+    NVRM: Xid 13, name=vrcompositor, Graphics Exception: Shader Program Header 9 Error
+    nvidia-modeset: ERROR: GPU:0: Idling display engine timed out  (-> whole desktop freezes/lags)
+  followed by "WaitForPendingPresent: failed" and watchdog abort in WaitForPresent.
+- Downgrading SteamVR did NOT help. Conclusion: SteamVR compositor on this
+  Maxwell GPU + NVIDIA 580 is unusable. Not fixable from driver.cpp.
+
+NEW PLAN: MONADO (OpenXR runtime) VIA ENVISION
+----------------------------------------------
+- Envision = GUI that builds/runs Monado (+ optional xrizer/OpenComposite for
+  OpenVR games). Installed from AUR: envision-xr-git (compiled OK).
+- Install gotcha: global git config has
+    url.git@github.com:.insteadof https://github.com/
+  which breaks cargo git fetches. Fix: CARGO_NET_GIT_FETCH_WITH_CLI=true
+  (or ~/.cargo/config.toml: [net] git-fetch-with-cli = true).
+  Do NOT install AUR monado-git / xrizer-git; Envision builds those itself.
+- The optiforge SteamVR driver is NOT used by Monado. Monado needs its own
+  headset definition.
+
+NEXT STEPS (after reboot)
+-------------------------
+1. Close SteamVR (only one program can own the Watchman dongle).
+2. Run `envision`, pick the Lighthouse profile (uses SteamVR's lighthouse
+   driver), click Build (builds Monado), then Start.
+3. If Monado complains there is no HMD: add env var QWERTY_ENABLE=1 to the
+   profile (keyboard/mouse fake HMD) just for testing.
+4. Test: hello_xr -g Vulkan2  (from the openxr package)
+   Check: does the desktop stay smooth (no Xid 13 / display engine timeouts
+   in `journalctl -k`)? Does the cube scene render? Are trackers in the log?
+   If it freezes: press Stop in Envision.
+   If it also crashes the GPU -> NVIDIA/Maxwell driver problem, not SteamVR.
+
+LATER STEPS (if the test works)
+-------------------------------
+- Head pose from a Vive tracker: Monado "tracking_overrides" in
+  ~/.config/monado/config_v0.json (tracker serial -> HMD, with offset),
+  equivalent to trackerSerial/trackerOffset*/trackerYaw.. in the SteamVR driver.
+- Custom HMD driver: fork Monado, copy the `sample` HMD driver
+  (src/xrt/drivers/), set Waveshare resolution/refresh/FOV/distortion, point
+  the Envision profile at the fork's git URL/branch.
+- Display output: prefer Monado's windowed/fullscreen-on-a-monitor mode
+  (panel as a normal desktop monitor, non-desktop 0) to avoid display leasing.
+  NVIDIA direct mode in Monado needs the monitor name allow-listed via an env
+  var (verify exact names in Monado docs).
+- Panel is portrait 1080x1920; eye split / rotation must match how it is
+  mounted in the headset.
+- Showcase content ideas (native OpenXR, light on GPU): Blender VR scene
+  inspection add-on, or a small custom Godot OpenXR scene.
+
+REPO STATE NOTES
+----------------
+- Branch index-compat. Uncommitted driver.cpp changes: Linux-only
+  IsDisplayOnDesktop()=false, IsDisplayRealDisplay()=true,
+  DisplayDebugMode=false (Windows unchanged).
+- steamvr/optiforge/ was MOVED (not copied) into
+  ~/.local/share/Steam/steamapps/common/SteamVR/drivers/optiforge, so git shows
+  it deleted. The installed copy has the updated default.vrsettings
+  (windowWidth 1080, windowHeight 1920, displayFrequency 60,
+  secondsFromVsyncToPhotons 0.01666667). Restore into the repo with:
+    cp -r ~/.local/share/Steam/steamapps/common/SteamVR/drivers/optiforge steamvr/
+- User builds the project themselves; don't build unless asked.

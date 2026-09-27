@@ -1,0 +1,4 @@
+src/
+pkg/
+monado/
+*.pkg.tar.zst

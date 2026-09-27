@@ -332,7 +332,11 @@ public:
 		vr::VRProperties()->SetFloatProperty(m_ulPropertyContainer, Prop_UserHeadToEyeDepthMeters_Float, 0.f);
 		vr::VRProperties()->SetFloatProperty(m_ulPropertyContainer, Prop_DisplayFrequency_Float, m_flDisplayFrequency);
 		vr::VRProperties()->SetFloatProperty(m_ulPropertyContainer, Prop_SecondsFromVsyncToPhotons_Float, m_flSecondsFromVsyncToPhotons);
+#if defined( _WIN32 )
 		vr::VRProperties()->SetBoolProperty(m_ulPropertyContainer, Prop_DisplayDebugMode_Bool, true);
+#else
+		vr::VRProperties()->SetBoolProperty(m_ulPropertyContainer, Prop_DisplayDebugMode_Bool, false);
+#endif
 
 		// return a constant that's not 0 (invalid) or 1 (reserved for Oculus)
 		// Replaced with the lighthouse universe once the tag is found, see UpdateTag()
@@ -451,14 +455,23 @@ public:
 		*pnHeight = m_nWindowHeight;
 	}
 
+	// Windows uses a desktop window, Linux only supports direct mode (the compositor leases the panel)
 	virtual bool IsDisplayOnDesktop() override
 	{
+#if defined( _WIN32 )
 		return true;
+#else
+		return false;
+#endif
 	}
 
 	virtual bool IsDisplayRealDisplay() override
 	{
+#if defined( _WIN32 )
 		return false;
+#else
+		return true;
+#endif
 	}
 
 	virtual void GetRecommendedRenderTargetSize(uint32_t* pnWidth, uint32_t* pnHeight) override
