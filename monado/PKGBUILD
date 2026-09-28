@@ -1,0 +1,49 @@
+# Based on the AUR monado-git PKGBUILD (Maintainer: Christoph Haag <christoph.haag@collabora.com>),
+# pinned to the commit 0001-optiforge-hmd.patch was written against, with the patch applied.
+
+pkgname="monado-git"
+_dirname="monado"
+_commit=e936b6a53
+pkgver=25.1.0.r857.ge936b6a53
+pkgrel=1
+pkgdesc='The open source OpenXR runtime (with the Optiforge HMD).'
+arch=('i686' 'x86_64')
+url='https://monado.dev'
+depends=('openxr' 'vulkan-icd-loader' 'libgl' 'wayland' 'xr-hardware' 'libcap' 'libbsd' 'libdrm' 'openvr' 'libsurvive-git')
+conflicts=('monado')
+makedepends=('eigen' 'ninja' 'shaderc' 'cmake' 'git' 'vulkan-headers' 'python' 'wayland-protocols')
+provides=("openxr-runtime" "monado=${pkgver}")
+install=monado.install
+
+license=('BSL-1.0')
+source=("$_dirname::git+https://gitlab.freedesktop.org/monado/monado.git#commit=${_commit}"
+        "0001-optiforge-hmd.patch")
+md5sums=('SKIP'
+         'SKIP')
+
+pkgver() {
+  cd "$_dirname"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+prepare() {
+  cd "$_dirname"
+  git apply "$srcdir/0001-optiforge-hmd.patch"
+}
+
+build() {
+  cd "$_dirname"
+  cmake \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr/ \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -GNinja -B"$srcdir"/"$_dirname"-build \
+    -DXRT_HAVE_SYSTEM_CJSON:BOOL='OFF' \
+
+  ninja -C "$srcdir"/"$_dirname"-build
+}
+
+package() {
+  cd "$_dirname"-build
+  DESTDIR="$pkgdir" ninja install
+}

@@ -16,6 +16,9 @@ FetchContent_Declare(
     URL https://github.com/ValveSoftware/openvr/archive/refs/tags/v2.5.1.tar.gz
     URL_HASH SHA256=54f654fce001682d8ac608f544a6c41e03a672b005c1deca3579fa36480a537c
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    # Only the headers and prebuilt libs are used, don't build openvr_api
+    # from source (it also doesn't build with MinGW).
+    EXCLUDE_FROM_ALL
 )
 
 # openvr v2.5.1's CMakeLists.txt requires CMake 2.8, which CMake >= 4.0
@@ -50,6 +53,12 @@ target_link_libraries(driver_optiforge PRIVATE ${OPENVR_API_LIB})
 
 if(WIN32)
     target_link_libraries(driver_optiforge PRIVATE ws2_32)
+endif()
+
+# Bundle the MinGW runtime (libstdc++, libgcc, winpthread) into the DLL,
+# so SteamVR doesn't need any extra DLLs next to it.
+if(MINGW)
+    target_link_options(driver_optiforge PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
 
 set_target_properties(driver_optiforge PROPERTIES

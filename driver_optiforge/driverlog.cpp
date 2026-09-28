@@ -7,7 +7,7 @@
 
 static vr::IVRDriverLog* s_pLogFile = NULL;
 
-#if !defined( WIN32)
+#if !defined( _MSC_VER )
 #define vsnprintf_s vsnprintf
 #endif
 

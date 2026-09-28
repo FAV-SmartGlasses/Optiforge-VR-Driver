@@ -1,0 +1,547 @@
+From 45d28dca7719b66e3a786331b280f3394a0fb48f Mon Sep 17 00:00:00 2001
+From: Miky8745 <vanecek.petr@gmail.com>
+Date: Sun, 27 Sep 2026 19:38:53 +0200
+Subject: [PATCH] Add Optiforge HMD, tracked by a Vive tracker, to the
+ lighthouse builder
+
+---
+ src/xrt/drivers/CMakeLists.txt                |   4 +
+ src/xrt/drivers/optiforge/optiforge_hmd.c     | 384 ++++++++++++++++++
+ .../drivers/optiforge/optiforge_interface.h   |  48 +++
+ src/xrt/targets/common/CMakeLists.txt         |   1 +
+ .../common/target_builder_lighthouse.c        |  32 +-
+ 5 files changed, 463 insertions(+), 6 deletions(-)
+ create mode 100644 src/xrt/drivers/optiforge/optiforge_hmd.c
+ create mode 100644 src/xrt/drivers/optiforge/optiforge_interface.h
+
+diff --git a/src/xrt/drivers/CMakeLists.txt b/src/xrt/drivers/CMakeLists.txt
+index 5ec99108b..4319ac3ac 100644
+--- a/src/xrt/drivers/CMakeLists.txt
++++ b/src/xrt/drivers/CMakeLists.txt
+@@ -544,6 +544,10 @@ add_library(drv_multi STATIC multi_wrapper/multi.c multi_wrapper/multi.h)
+ target_link_libraries(drv_multi PUBLIC xrt-interfaces aux_util)
+ list(APPEND ENABLED_HEADSET_DRIVERS drv_multi)
+ 
++add_library(drv_optiforge STATIC optiforge/optiforge_hmd.c optiforge/optiforge_interface.h)
++target_link_libraries(drv_optiforge PUBLIC xrt-interfaces aux_util)
++list(APPEND ENABLED_HEADSET_DRIVERS drv_optiforge)
++
+ if(XRT_BUILD_DRIVER_WMR)
+ 	add_library(
+ 		drv_wmr STATIC
+diff --git a/src/xrt/drivers/optiforge/optiforge_hmd.c b/src/xrt/drivers/optiforge/optiforge_hmd.c
+new file mode 100644
+index 000000000..032232e76
+--- /dev/null
++++ b/src/xrt/drivers/optiforge/optiforge_hmd.c
+@@ -0,0 +1,384 @@
++// Copyright 2026, Optiforge.
++// SPDX-License-Identifier: BSL-1.0
++/*!
++ * @file
++ * @brief  Optiforge HMD: Waveshare 1080x1920 portrait panel, head pose from a Vive tracker mounted on the headset.
++ *
++ * Based on the sample HMD driver. Configured with environment variables:
++ *
++ * - OPTIFORGE_HMD=1                  enable (checked by the lighthouse builder)
++ * - OPTIFORGE_TRACKER_SERIAL         tracker serial (e.g. LHR-8BD7C17A), empty = first generic tracker
++ * - OPTIFORGE_TRACKER_OFFSET_X/Y/Z   head (centre between the eyes) position in the tracker's axes, metres
++ * - OPTIFORGE_TRACKER_YAW/PITCH/ROLL head rotation relative to the tracker, degrees (Y, X, Z axes, applied in that
++ *                                    order, same as trackerYaw/Pitch/Roll in the SteamVR driver)
++ * - OPTIFORGE_PANEL_ROTATION         none (left/right halves of the panel), left or right (top/bottom halves,
++ *                                    rotated 90 degrees)
++ * - OPTIFORGE_SWAP_EYES=1            swap which half of the panel is the left eye
++ * - OPTIFORGE_FOV                    horizontal field of view per eye, degrees (vertical follows the aspect ratio)
++ * - OPTIFORGE_REFRESH_HZ             panel refresh rate
++ *
++ * @ingroup drv_optiforge
++ */
++
++#include "xrt/xrt_defines.h"
++#include "xrt/xrt_device.h"
++#include "xrt/xrt_results.h"
++
++#include "math/m_api.h"
++#include "math/m_mathinclude.h" // IWYU pragma: keep
++#include "math/m_space.h"
++
++#include "util/u_debug.h"
++#include "util/u_device.h"
++#include "util/u_distortion_mesh.h"
++#include "util/u_logging.h"
++#include "util/u_misc.h"
++#include "util/u_time.h"
++#include "util/u_var.h"
++#include "util/u_visibility_mask.h"
++
++#include "optiforge_interface.h"
++
++#include <stdio.h>
++#include <string.h>
++
++
++/*
++ *
++ * Structs and defines.
++ *
++ */
++
++#define PANEL_W_PIXELS 1080
++#define PANEL_H_PIXELS 1920
++
++DEBUG_GET_ONCE_LOG_OPTION(optiforge_log, "OPTIFORGE_LOG", U_LOGGING_INFO)
++DEBUG_GET_ONCE_BOOL_OPTION(optiforge_hmd, "OPTIFORGE_HMD", false)
++DEBUG_GET_ONCE_OPTION(optiforge_tracker_serial, "OPTIFORGE_TRACKER_SERIAL", NULL)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_x, "OPTIFORGE_TRACKER_OFFSET_X", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_y, "OPTIFORGE_TRACKER_OFFSET_Y", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_z, "OPTIFORGE_TRACKER_OFFSET_Z", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_yaw, "OPTIFORGE_TRACKER_YAW", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_pitch, "OPTIFORGE_TRACKER_PITCH", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_roll, "OPTIFORGE_TRACKER_ROLL", 0.0f)
++DEBUG_GET_ONCE_OPTION(optiforge_panel_rotation, "OPTIFORGE_PANEL_ROTATION", "none")
++DEBUG_GET_ONCE_BOOL_OPTION(optiforge_swap_eyes, "OPTIFORGE_SWAP_EYES", false)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_fov, "OPTIFORGE_FOV", 90.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_refresh_hz, "OPTIFORGE_REFRESH_HZ", 60.0f)
++
++#define OF_DEBUG(hmd, ...) U_LOG_XDEV_IFL_D(&hmd->base, hmd->log_level, __VA_ARGS__)
++#define OF_INFO(hmd, ...) U_LOG_XDEV_IFL_I(&hmd->base, hmd->log_level, __VA_ARGS__)
++#define OF_WARN(hmd, ...) U_LOG_XDEV_IFL_W(&hmd->base, hmd->log_level, __VA_ARGS__)
++#define OF_ERROR(hmd, ...) U_LOG_XDEV_IFL_E(&hmd->base, hmd->log_level, __VA_ARGS__)
++
++enum optiforge_panel_rotation
++{
++	PANEL_ROTATION_NONE,
++	PANEL_ROTATION_LEFT,
++	PANEL_ROTATION_RIGHT,
++};
++
++/*!
++ * The Optiforge HMD.
++ *
++ * @implements xrt_device
++ */
++struct optiforge_hmd
++{
++	struct xrt_device base;
++
++	//! Vive tracker mounted on the headset, not owned by us.
++	struct xrt_device *tracker;
++
++	//! Head position in the tracker's axes, metres. Editable in the debug GUI.
++	struct xrt_vec3 offset_position;
++
++	//! Head rotation relative to the tracker, degrees. Editable in the debug GUI.
++	float yaw_deg, pitch_deg, roll_deg;
++
++	enum u_logging_level log_level;
++};
++
++
++/// Casting helper function
++static inline struct optiforge_hmd *
++optiforge_hmd(struct xrt_device *xdev)
++{
++	return (struct optiforge_hmd *)xdev;
++}
++
++static void
++get_offset_pose(struct optiforge_hmd *hmd, struct xrt_pose *out_pose)
++{
++	const struct xrt_vec3 y_axis = {0.0f, 1.0f, 0.0f};
++	const struct xrt_vec3 x_axis = {1.0f, 0.0f, 0.0f};
++	const struct xrt_vec3 z_axis = {0.0f, 0.0f, 1.0f};
++
++	struct xrt_quat yaw, pitch, roll, yaw_pitch;
++	math_quat_from_angle_vector(hmd->yaw_deg * (float)(M_PI / 180.0), &y_axis, &yaw);
++	math_quat_from_angle_vector(hmd->pitch_deg * (float)(M_PI / 180.0), &x_axis, &pitch);
++	math_quat_from_angle_vector(hmd->roll_deg * (float)(M_PI / 180.0), &z_axis, &roll);
++
++	// yaw * pitch * roll, same order as the SteamVR driver.
++	math_quat_rotate(&yaw, &pitch, &yaw_pitch);
++	math_quat_rotate(&yaw_pitch, &roll, &out_pose->orientation);
++	out_pose->position = hmd->offset_position;
++}
++
++static struct xrt_device *
++find_tracker(struct xrt_device **xdevs, size_t xdev_count, const char *serial)
++{
++	for (size_t i = 0; i < xdev_count; i++) {
++		struct xrt_device *xdev = xdevs[i];
++		if (xdev == NULL || xdev->device_type != XRT_DEVICE_TYPE_GENERIC_TRACKER) {
++			continue;
++		}
++		if (serial == NULL || serial[0] == '\0' || strncmp(xdev->serial, serial, XRT_DEVICE_NAME_LEN) == 0) {
++			return xdev;
++		}
++	}
++	return NULL;
++}
++
++static enum optiforge_panel_rotation
++get_panel_rotation(void)
++{
++	const char *str = debug_get_option_optiforge_panel_rotation();
++	if (str != NULL && strcmp(str, "left") == 0) {
++		return PANEL_ROTATION_LEFT;
++	}
++	if (str != NULL && strcmp(str, "right") == 0) {
++		return PANEL_ROTATION_RIGHT;
++	}
++	return PANEL_ROTATION_NONE;
++}
++
++static void
++setup_views(struct optiforge_hmd *hmd, enum optiforge_panel_rotation rotation, bool swap_eyes)
++{
++	struct xrt_hmd_parts *parts = hmd->base.hmd;
++
++	// The panel as the OS sees it.
++	parts->screens[0].w_pixels = PANEL_W_PIXELS;
++	parts->screens[0].h_pixels = PANEL_H_PIXELS;
++
++	// Index of the panel half used by each eye: 0 = left/top, 1 = right/bottom.
++	uint32_t half[2] = {0, 1};
++	if (rotation == PANEL_ROTATION_RIGHT) {
++		half[0] = 1;
++		half[1] = 0;
++	}
++	if (swap_eyes) {
++		uint32_t tmp = half[0];
++		half[0] = half[1];
++		half[1] = tmp;
++	}
++
++	for (uint32_t eye = 0; eye < 2; eye++) {
++		struct xrt_view *view = &parts->views[eye];
++
++		if (rotation == PANEL_ROTATION_NONE) {
++			// Left and right halves of the portrait panel, no rotation.
++			view->viewport.x_pixels = half[eye] * (PANEL_W_PIXELS / 2);
++			view->viewport.y_pixels = 0;
++			view->viewport.w_pixels = PANEL_W_PIXELS / 2;
++			view->viewport.h_pixels = PANEL_H_PIXELS;
++			view->display.w_pixels = PANEL_W_PIXELS / 2;
++			view->display.h_pixels = PANEL_H_PIXELS;
++			view->rot = u_device_rotation_ident;
++		} else {
++			// Top and bottom halves, rotated (like the OSVR HDK). Viewport is before rotation, display after.
++			view->viewport.x_pixels = 0;
++			view->viewport.y_pixels = half[eye] * (PANEL_H_PIXELS / 2);
++			view->viewport.w_pixels = PANEL_W_PIXELS;
++			view->viewport.h_pixels = PANEL_H_PIXELS / 2;
++			view->display.w_pixels = PANEL_H_PIXELS / 2;
++			view->display.h_pixels = PANEL_W_PIXELS;
++			view->rot = rotation == PANEL_ROTATION_LEFT ? u_device_rotation_left : u_device_rotation_right;
++		}
++
++		// Symmetric FOV, vertical from the aspect ratio so pixels stay square.
++		double h_fov = debug_get_float_option_optiforge_fov() * (M_PI / 180.0);
++		double aspect = (double)view->display.h_pixels / (double)view->display.w_pixels;
++		double v_fov = 2.0 * atan(tan(h_fov / 2.0) * aspect);
++
++		parts->distortion.fov[eye].angle_left = (float)(-h_fov / 2.0);
++		parts->distortion.fov[eye].angle_right = (float)(h_fov / 2.0);
++		parts->distortion.fov[eye].angle_up = (float)(v_fov / 2.0);
++		parts->distortion.fov[eye].angle_down = (float)(-v_fov / 2.0);
++	}
++}
++
++
++/*
++ *
++ * Device functions.
++ *
++ */
++
++static void
++optiforge_hmd_destroy(struct xrt_device *xdev)
++{
++	struct optiforge_hmd *hmd = optiforge_hmd(xdev);
++
++	// Remove the variable tracking.
++	u_var_remove_root(hmd);
++
++	u_device_free(&hmd->base);
++}
++
++static xrt_result_t
++optiforge_hmd_get_tracked_pose(struct xrt_device *xdev,
++                               enum xrt_input_name name,
++                               int64_t at_timestamp_ns,
++                               struct xrt_space_relation *out_relation)
++{
++	struct optiforge_hmd *hmd = optiforge_hmd(xdev);
++
++	if (name != XRT_INPUT_GENERIC_HEAD_POSE) {
++		U_LOG_XDEV_UNSUPPORTED_INPUT(&hmd->base, hmd->log_level, name);
++		return XRT_ERROR_INPUT_UNSUPPORTED;
++	}
++
++	struct xrt_space_relation tracker_relation;
++	xrt_result_t xret = xrt_device_get_tracked_pose( //
++	    hmd->tracker,                                //
++	    XRT_INPUT_GENERIC_TRACKER_POSE,              //
++	    at_timestamp_ns,                             //
++	    &tracker_relation);                          //
++	if (xret != XRT_SUCCESS) {
++		return xret;
++	}
++
++	// Head pose = tracker pose * head-in-tracker offset.
++	struct xrt_pose offset;
++	get_offset_pose(hmd, &offset);
++
++	struct xrt_relation_chain xrc = {0};
++	m_relation_chain_push_pose_if_not_identity(&xrc, &offset);
++	m_relation_chain_push_relation(&xrc, &tracker_relation);
++	m_relation_chain_resolve(&xrc, out_relation);
++
++	return XRT_SUCCESS;
++}
++
++static xrt_result_t
++optiforge_hmd_get_view_poses(struct xrt_device *xdev,
++                             const struct xrt_vec3 *default_eye_relation,
++                             int64_t at_timestamp_ns,
++                             enum xrt_view_type view_type,
++                             uint32_t view_count,
++                             struct xrt_space_relation *out_head_relation,
++                             struct xrt_fov *out_fovs,
++                             struct xrt_pose *out_poses)
++{
++	return u_device_get_view_poses( //
++	    xdev,                       //
++	    default_eye_relation,       //
++	    at_timestamp_ns,            //
++	    view_type,                  //
++	    view_count,                 //
++	    out_head_relation,          //
++	    out_fovs,                   //
++	    out_poses);                 //
++}
++
++static xrt_result_t
++optiforge_hmd_get_visibility_mask(struct xrt_device *xdev,
++                                  enum xrt_visibility_mask_type type,
++                                  uint32_t view_index,
++                                  struct xrt_visibility_mask **out_mask)
++{
++	struct xrt_fov fov = xdev->hmd->distortion.fov[view_index];
++	u_visibility_mask_get_default(type, &fov, out_mask);
++	return XRT_SUCCESS;
++}
++
++
++/*
++ *
++ * 'Exported' functions.
++ *
++ */
++
++bool
++optiforge_hmd_enabled(void)
++{
++	return debug_get_bool_option_optiforge_hmd();
++}
++
++struct xrt_device *
++optiforge_hmd_create(struct xrt_device **xdevs, size_t xdev_count)
++{
++	enum u_logging_level log_level = debug_get_log_option_optiforge_log();
++	const char *serial = debug_get_option_optiforge_tracker_serial();
++
++	struct xrt_device *tracker = find_tracker(xdevs, xdev_count, serial);
++	if (tracker == NULL) {
++		U_LOG_IFL_E(log_level, "Optiforge HMD: tracker '%s' not found, is it on and seen by the base stations?",
++		            (serial != NULL && serial[0] != '\0') ? serial : "(any generic tracker)");
++		return NULL;
++	}
++
++	// No U_DEVICE_ALLOC_TRACKING_NONE: we use the tracker's tracking origin.
++	enum u_device_alloc_flags flags = U_DEVICE_ALLOC_HMD;
++	struct optiforge_hmd *hmd = U_DEVICE_ALLOCATE(struct optiforge_hmd, flags, 1, 0);
++
++	u_device_populate_function_pointers(&hmd->base, optiforge_hmd_get_tracked_pose, optiforge_hmd_destroy);
++	hmd->base.get_view_poses = optiforge_hmd_get_view_poses;
++	hmd->base.get_visibility_mask = optiforge_hmd_get_visibility_mask;
++
++	hmd->log_level = log_level;
++	hmd->tracker = tracker;
++	hmd->base.tracking_origin = tracker->tracking_origin;
++
++	hmd->offset_position.x = debug_get_float_option_optiforge_offset_x();
++	hmd->offset_position.y = debug_get_float_option_optiforge_offset_y();
++	hmd->offset_position.z = debug_get_float_option_optiforge_offset_z();
++	hmd->yaw_deg = debug_get_float_option_optiforge_yaw();
++	hmd->pitch_deg = debug_get_float_option_optiforge_pitch();
++	hmd->roll_deg = debug_get_float_option_optiforge_roll();
++
++	// This list should be ordered, most preferred first.
++	size_t idx = 0;
++	hmd->base.hmd->blend_modes[idx++] = XRT_BLEND_MODE_OPAQUE;
++	hmd->base.hmd->blend_mode_count = idx;
++
++	snprintf(hmd->base.str, XRT_DEVICE_NAME_LEN, "Optiforge HMD");
++	snprintf(hmd->base.serial, XRT_DEVICE_NAME_LEN, "Optiforge HMD");
++
++	// Setup input.
++	hmd->base.name = XRT_DEVICE_GENERIC_HMD;
++	hmd->base.device_type = XRT_DEVICE_TYPE_HMD;
++	hmd->base.inputs[0].name = XRT_INPUT_GENERIC_HEAD_POSE;
++	hmd->base.supported.orientation_tracking = tracker->supported.orientation_tracking;
++	hmd->base.supported.position_tracking = tracker->supported.position_tracking;
++
++	// Display.
++	float refresh_hz = debug_get_float_option_optiforge_refresh_hz();
++	hmd->base.hmd->screens[0].nominal_frame_interval_ns = time_s_to_ns(1.0f / refresh_hz);
++
++	enum optiforge_panel_rotation rotation = get_panel_rotation();
++	bool swap_eyes = debug_get_bool_option_optiforge_swap_eyes();
++	setup_views(hmd, rotation, swap_eyes);
++
++	// No lenses modelled yet, fills in xdev->compute_distortion().
++	u_distortion_mesh_set_none(&hmd->base);
++
++	OF_INFO(hmd, "Using tracker '%s' (%s)", tracker->serial, tracker->str);
++	OF_INFO(hmd, "Tracker offset: %f %f %f, rotation (yaw pitch roll): %f %f %f", hmd->offset_position.x,
++	        hmd->offset_position.y, hmd->offset_position.z, hmd->yaw_deg, hmd->pitch_deg, hmd->roll_deg);
++	OF_INFO(hmd, "Panel %dx%d @ %.2f Hz, rotation %s, eyes %s, FOV %.1f deg", PANEL_W_PIXELS, PANEL_H_PIXELS,
++	        refresh_hz, debug_get_option_optiforge_panel_rotation(), swap_eyes ? "swapped" : "normal",
++	        debug_get_float_option_optiforge_fov());
++
++	// Setup variable tracker, the offset can be tuned live in the debug GUI.
++	u_var_add_root(hmd, "Optiforge HMD", true);
++	u_var_add_log_level(hmd, &hmd->log_level, "log_level");
++	u_var_add_vec3_f32(hmd, &hmd->offset_position, "Tracker offset (m)");
++	u_var_add_f32(hmd, &hmd->yaw_deg, "Tracker yaw (deg)");
++	u_var_add_f32(hmd, &hmd->pitch_deg, "Tracker pitch (deg)");
++	u_var_add_f32(hmd, &hmd->roll_deg, "Tracker roll (deg)");
++
++	return &hmd->base;
++}
+diff --git a/src/xrt/drivers/optiforge/optiforge_interface.h b/src/xrt/drivers/optiforge/optiforge_interface.h
+new file mode 100644
+index 000000000..c04d0aa9f
+--- /dev/null
++++ b/src/xrt/drivers/optiforge/optiforge_interface.h
+@@ -0,0 +1,48 @@
++// Copyright 2026, Optiforge.
++// SPDX-License-Identifier: BSL-1.0
++/*!
++ * @file
++ * @brief  Interface to the Optiforge HMD driver.
++ * @ingroup drv_optiforge
++ */
++
++#pragma once
++
++#include <stdbool.h>
++#include <stddef.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++struct xrt_device;
++
++/*!
++ * @defgroup drv_optiforge Optiforge HMD driver
++ * @ingroup drv
++ *
++ * @brief Headset with a Waveshare 1080x1920 panel, head pose from a Vive tracker mounted on it.
++ */
++
++/*!
++ * Is the Optiforge HMD enabled (OPTIFORGE_HMD env variable)?
++ *
++ * @ingroup drv_optiforge
++ */
++bool
++optiforge_hmd_enabled(void);
++
++/*!
++ * Create the Optiforge HMD. Its pose comes from one of the given tracker devices (OPTIFORGE_TRACKER_SERIAL, or the
++ * first generic tracker if that is empty). The tracker must outlive the HMD.
++ *
++ * @return The HMD, or NULL if no suitable tracker was found.
++ * @ingroup drv_optiforge
++ */
++struct xrt_device *
++optiforge_hmd_create(struct xrt_device **xdevs, size_t xdev_count);
++
++
++#ifdef __cplusplus
++}
++#endif
+diff --git a/src/xrt/targets/common/CMakeLists.txt b/src/xrt/targets/common/CMakeLists.txt
+index f3f46c911..6c62d974a 100644
+--- a/src/xrt/targets/common/CMakeLists.txt
++++ b/src/xrt/targets/common/CMakeLists.txt
+@@ -50,6 +50,7 @@ endif()
+ 
+ if(XRT_BUILD_DRIVER_SURVIVE OR XRT_BUILD_DRIVER_VIVE)
+ 	target_sources(target_lists PRIVATE target_builder_lighthouse.c)
++	target_link_libraries(target_lists PRIVATE drv_optiforge)
+ endif()
+ 
+ if(XRT_BUILD_DRIVER_STEAMVR_LIGHTHOUSE)
+diff --git a/src/xrt/targets/common/target_builder_lighthouse.c b/src/xrt/targets/common/target_builder_lighthouse.c
+index 49f78b5a5..41e0168cb 100644
+--- a/src/xrt/targets/common/target_builder_lighthouse.c
++++ b/src/xrt/targets/common/target_builder_lighthouse.c
+@@ -59,6 +59,8 @@
+ #include "opengloves/opengloves_interface.h"
+ #endif
+ 
++#include "optiforge/optiforge_interface.h"
++
+ #if defined(XRT_BUILD_DRIVER_SURVIVE)
+ #define DEFAULT_DRIVER "survive"
+ #else
+@@ -338,12 +340,20 @@ lighthouse_estimate_system(struct xrt_builder *xb,
+ 
+ 	bool have_6dof = lhs->driver != DRIVER_VIVE;
+ 
+-	return vive_builder_estimate( //
+-	    xp,                       // xp
+-	    have_6dof,                // have_6dof
+-	    have_hand_tracking,       // have_hand_tracking
+-	    &lhs->is_valve_index,     // out_have_valve_index
+-	    estimate);                // out_estimate
++	xrt_result_t xret = vive_builder_estimate( //
++	    xp,                                    // xp
++	    have_6dof,                             // have_6dof
++	    have_hand_tracking,                    // have_hand_tracking
++	    &lhs->is_valve_index,                  // out_have_valve_index
++	    estimate);                             // out_estimate
++
++	// The Optiforge HMD is created from a tracker, so we can always make a head.
++	if (xret == XRT_SUCCESS && optiforge_hmd_enabled()) {
++		estimate->certain.head = true;
++		estimate->maybe.head = true;
++	}
++
++	return xret;
+ }
+ 
+ // If the HMD is a Valve Index, decide if we want visual (HT/Slam) trackers, and if so set them up.
+@@ -632,6 +642,16 @@ lighthouse_open_system_impl(struct xrt_builder *xb,
+ 	u_device_assign_xdev_roles(xsysd->static_xdevs, xsysd->static_xdev_count, &head_idx, &eyes_idx, &face_idx,
+ 	                           &left_idx, &right_idx, &gamepad_idx);
+ 
++	// No real HMD: make the Optiforge HMD, tracked by a Vive tracker mounted on it.
++	if (head_idx < 0 && optiforge_hmd_enabled() && xsysd->static_xdev_count < ARRAY_SIZE(xsysd->static_xdevs)) {
++		struct xrt_device *optiforge = optiforge_hmd_create(xsysd->static_xdevs, xsysd->static_xdev_count);
++		if (optiforge != NULL) {
++			xsysd->static_xdevs[xsysd->static_xdev_count++] = optiforge;
++			u_device_assign_xdev_roles(xsysd->static_xdevs, xsysd->static_xdev_count, &head_idx, &eyes_idx,
++			                           &face_idx, &left_idx, &right_idx, &gamepad_idx);
++		}
++	}
++
+ 	if (head_idx < 0) {
+ 		LH_ERROR("Unable to find HMD");
+ 		result = XRT_ERROR_DEVICE_CREATION_FAILED;
+-- 
+2.55.0
+
