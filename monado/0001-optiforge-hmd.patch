@@ -1,16 +1,16 @@
-From 45d28dca7719b66e3a786331b280f3394a0fb48f Mon Sep 17 00:00:00 2001
+From d4d12c1fe4acac33cc6cab7a379367d637073fb1 Mon Sep 17 00:00:00 2001
 From: Miky8745 <vanecek.petr@gmail.com>
-Date: Sun, 27 Sep 2026 19:38:53 +0200
+Date: Thu, 1 Oct 2026 19:42:17 +0200
 Subject: [PATCH] Add Optiforge HMD, tracked by a Vive tracker, to the
  lighthouse builder
 
 ---
  src/xrt/drivers/CMakeLists.txt                |   4 +
- src/xrt/drivers/optiforge/optiforge_hmd.c     | 384 ++++++++++++++++++
- .../drivers/optiforge/optiforge_interface.h   |  48 +++
+ src/xrt/drivers/optiforge/optiforge_hmd.c     | 458 ++++++++++++++++++
+ .../drivers/optiforge/optiforge_interface.h   |  48 ++
  src/xrt/targets/common/CMakeLists.txt         |   1 +
  .../common/target_builder_lighthouse.c        |  32 +-
- 5 files changed, 463 insertions(+), 6 deletions(-)
+ 5 files changed, 537 insertions(+), 6 deletions(-)
  create mode 100644 src/xrt/drivers/optiforge/optiforge_hmd.c
  create mode 100644 src/xrt/drivers/optiforge/optiforge_interface.h
 
@@ -31,10 +31,10 @@ index 5ec99108b..4319ac3ac 100644
  		drv_wmr STATIC
 diff --git a/src/xrt/drivers/optiforge/optiforge_hmd.c b/src/xrt/drivers/optiforge/optiforge_hmd.c
 new file mode 100644
-index 000000000..032232e76
+index 000000000..b47dacd7d
 --- /dev/null
 +++ b/src/xrt/drivers/optiforge/optiforge_hmd.c
-@@ -0,0 +1,384 @@
+@@ -0,0 +1,458 @@
 +// Copyright 2026, Optiforge.
 +// SPDX-License-Identifier: BSL-1.0
 +/*!
@@ -45,9 +45,12 @@ index 000000000..032232e76
 + *
 + * - OPTIFORGE_HMD=1                  enable (checked by the lighthouse builder)
 + * - OPTIFORGE_TRACKER_SERIAL         tracker serial (e.g. LHR-8BD7C17A), empty = first generic tracker
-+ * - OPTIFORGE_TRACKER_OFFSET_X/Y/Z   head (centre between the eyes) position in the tracker's axes, metres
 + * - OPTIFORGE_TRACKER_YAW/PITCH/ROLL head rotation relative to the tracker, degrees (Y, X, Z axes, applied in that
 + *                                    order, same as trackerYaw/Pitch/Roll in the SteamVR driver)
++ * - OPTIFORGE_FORWARD_CORRECTION     sensor distance in front of the eyes, centimetres
++ * - OPTIFORGE_CENTER_CORRECTION      sensor distance to the wearer's right of the centre between the eyes, centimetres
++ * - OPTIFORGE_HEIGHT_CORRECTION      sensor distance above the eyes, centimetres
++ * - OPTIFORGE_INVERT_YAW/PITCH/ROLL=1 invert that axis of the head rotation (like "invert mouse" in games)
 + * - OPTIFORGE_PANEL_ROTATION         none (left/right halves of the panel), left or right (top/bottom halves,
 + *                                    rotated 90 degrees)
 + * - OPTIFORGE_SWAP_EYES=1            swap which half of the panel is the left eye
@@ -63,7 +66,7 @@ index 000000000..032232e76
 +
 +#include "math/m_api.h"
 +#include "math/m_mathinclude.h" // IWYU pragma: keep
-+#include "math/m_space.h"
++#include "math/m_vec3.h"
 +
 +#include "util/u_debug.h"
 +#include "util/u_device.h"
@@ -92,12 +95,15 @@ index 000000000..032232e76
 +DEBUG_GET_ONCE_LOG_OPTION(optiforge_log, "OPTIFORGE_LOG", U_LOGGING_INFO)
 +DEBUG_GET_ONCE_BOOL_OPTION(optiforge_hmd, "OPTIFORGE_HMD", false)
 +DEBUG_GET_ONCE_OPTION(optiforge_tracker_serial, "OPTIFORGE_TRACKER_SERIAL", NULL)
-+DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_x, "OPTIFORGE_TRACKER_OFFSET_X", 0.0f)
-+DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_y, "OPTIFORGE_TRACKER_OFFSET_Y", 0.0f)
-+DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_offset_z, "OPTIFORGE_TRACKER_OFFSET_Z", 0.0f)
 +DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_yaw, "OPTIFORGE_TRACKER_YAW", 0.0f)
 +DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_pitch, "OPTIFORGE_TRACKER_PITCH", 0.0f)
 +DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_roll, "OPTIFORGE_TRACKER_ROLL", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_forward_correction, "OPTIFORGE_FORWARD_CORRECTION", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_center_correction, "OPTIFORGE_CENTER_CORRECTION", 0.0f)
++DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_height_correction, "OPTIFORGE_HEIGHT_CORRECTION", 0.0f)
++DEBUG_GET_ONCE_BOOL_OPTION(optiforge_invert_yaw, "OPTIFORGE_INVERT_YAW", false)
++DEBUG_GET_ONCE_BOOL_OPTION(optiforge_invert_pitch, "OPTIFORGE_INVERT_PITCH", false)
++DEBUG_GET_ONCE_BOOL_OPTION(optiforge_invert_roll, "OPTIFORGE_INVERT_ROLL", false)
 +DEBUG_GET_ONCE_OPTION(optiforge_panel_rotation, "OPTIFORGE_PANEL_ROTATION", "none")
 +DEBUG_GET_ONCE_BOOL_OPTION(optiforge_swap_eyes, "OPTIFORGE_SWAP_EYES", false)
 +DEBUG_GET_ONCE_FLOAT_OPTION(optiforge_fov, "OPTIFORGE_FOV", 90.0f)
@@ -127,11 +133,15 @@ index 000000000..032232e76
 +	//! Vive tracker mounted on the headset, not owned by us.
 +	struct xrt_device *tracker;
 +
-+	//! Head position in the tracker's axes, metres. Editable in the debug GUI.
-+	struct xrt_vec3 offset_position;
-+
 +	//! Head rotation relative to the tracker, degrees. Editable in the debug GUI.
 +	float yaw_deg, pitch_deg, roll_deg;
++
++	//! Sensor position relative to the centre between the eyes, in the head's axes, centimetres: forward, to the
++	//! wearer's right, up. Editable in the debug GUI.
++	float forward_cm, center_cm, height_cm;
++
++	//! Invert these axes of the head rotation. Editable in the debug GUI.
++	bool invert_yaw, invert_pitch, invert_roll;
 +
 +	enum u_logging_level log_level;
 +};
@@ -144,22 +154,58 @@ index 000000000..032232e76
 +	return (struct optiforge_hmd *)xdev;
 +}
 +
++//! yaw * pitch * roll (Y, X, Z axes), same order as the SteamVR driver. Radians.
 +static void
-+get_offset_pose(struct optiforge_hmd *hmd, struct xrt_pose *out_pose)
++quat_from_yaw_pitch_roll(float yaw_rad, float pitch_rad, float roll_rad, struct xrt_quat *out_quat)
 +{
 +	const struct xrt_vec3 y_axis = {0.0f, 1.0f, 0.0f};
 +	const struct xrt_vec3 x_axis = {1.0f, 0.0f, 0.0f};
 +	const struct xrt_vec3 z_axis = {0.0f, 0.0f, 1.0f};
 +
 +	struct xrt_quat yaw, pitch, roll, yaw_pitch;
-+	math_quat_from_angle_vector(hmd->yaw_deg * (float)(M_PI / 180.0), &y_axis, &yaw);
-+	math_quat_from_angle_vector(hmd->pitch_deg * (float)(M_PI / 180.0), &x_axis, &pitch);
-+	math_quat_from_angle_vector(hmd->roll_deg * (float)(M_PI / 180.0), &z_axis, &roll);
++	math_quat_from_angle_vector(yaw_rad, &y_axis, &yaw);
++	math_quat_from_angle_vector(pitch_rad, &x_axis, &pitch);
++	math_quat_from_angle_vector(roll_rad, &z_axis, &roll);
 +
-+	// yaw * pitch * roll, same order as the SteamVR driver.
 +	math_quat_rotate(&yaw, &pitch, &yaw_pitch);
-+	math_quat_rotate(&yaw_pitch, &roll, &out_pose->orientation);
-+	out_pose->position = hmd->offset_position;
++	math_quat_rotate(&yaw_pitch, &roll, out_quat);
++}
++
++static void
++get_offset_rotation(struct optiforge_hmd *hmd, struct xrt_quat *out_quat)
++{
++	quat_from_yaw_pitch_roll(                   //
++	    hmd->yaw_deg * (float)(M_PI / 180.0),   //
++	    hmd->pitch_deg * (float)(M_PI / 180.0), //
++	    hmd->roll_deg * (float)(M_PI / 180.0),  //
++	    out_quat);                              //
++}
++
++/*!
++ * Invert the selected axes of the head rotation: split it into world yaw, pitch and roll (inverse of
++ * quat_from_yaw_pitch_roll), negate the selected angles and put it back together.
++ */
++static void
++invert_axes(struct optiforge_hmd *hmd, struct xrt_quat *q)
++{
++	if (!hmd->invert_yaw && !hmd->invert_pitch && !hmd->invert_roll) {
++		return;
++	}
++
++	float w = q->w, x = q->x, y = q->y, z = q->z;
++
++	float sin_pitch = -2.0f * (y * z - w * x);
++	sin_pitch = sin_pitch > 1.0f ? 1.0f : (sin_pitch < -1.0f ? -1.0f : sin_pitch);
++
++	float pitch = asinf(sin_pitch);
++	float yaw = atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y));
++	float roll = atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z));
++
++	quat_from_yaw_pitch_roll(               //
++	    hmd->invert_yaw ? -yaw : yaw,       //
++	    hmd->invert_pitch ? -pitch : pitch, //
++	    hmd->invert_roll ? -roll : roll,    //
++	    q);                                 //
 +}
 +
 +static struct xrt_device *
@@ -224,7 +270,8 @@ index 000000000..032232e76
 +			view->display.h_pixels = PANEL_H_PIXELS;
 +			view->rot = u_device_rotation_ident;
 +		} else {
-+			// Top and bottom halves, rotated (like the OSVR HDK). Viewport is before rotation, display after.
++			// Top and bottom halves, rotated (like the OSVR HDK). Viewport is before rotation, display
++			// after.
 +			view->viewport.x_pixels = 0;
 +			view->viewport.y_pixels = half[eye] * (PANEL_H_PIXELS / 2);
 +			view->viewport.w_pixels = PANEL_W_PIXELS;
@@ -287,14 +334,32 @@ index 000000000..032232e76
 +		return xret;
 +	}
 +
-+	// Head pose = tracker pose * head-in-tracker offset.
-+	struct xrt_pose offset;
-+	get_offset_pose(hmd, &offset);
++	// Head rotation = tracker rotation * head-relative-to-tracker rotation, then the inverted axes.
++	struct xrt_quat offset_rotation;
++	get_offset_rotation(hmd, &offset_rotation);
 +
-+	struct xrt_relation_chain xrc = {0};
-+	m_relation_chain_push_pose_if_not_identity(&xrc, &offset);
-+	m_relation_chain_push_relation(&xrc, &tracker_relation);
-+	m_relation_chain_resolve(&xrc, out_relation);
++	struct xrt_quat head_rotation;
++	math_quat_rotate(&tracker_relation.pose.orientation, &offset_rotation, &head_rotation);
++	invert_axes(hmd, &head_rotation);
++
++	// Centre between the eyes, from the sensor, in the head's axes (+X right, +Y up, -Z forward): back, to the
++	// wearer's left and down by the sensor corrections. Uses the final head rotation so it matches what is shown.
++	struct xrt_vec3 sensor_to_head = {
++	    -hmd->center_cm / 100.0f,
++	    -hmd->height_cm / 100.0f,
++	    hmd->forward_cm / 100.0f,
++	};
++	struct xrt_vec3 sensor_to_head_world;
++	math_quat_rotate_vec3(&head_rotation, &sensor_to_head, &sensor_to_head_world);
++
++	*out_relation = (struct xrt_space_relation)XRT_SPACE_RELATION_ZERO;
++	out_relation->pose.orientation = head_rotation;
++	out_relation->pose.position = m_vec3_add(tracker_relation.pose.position, sensor_to_head_world);
++
++	// Velocities would be wrong after the correction and inversion, nothing needs them for the head.
++	out_relation->relation_flags = (enum xrt_space_relation_flags)(
++	    tracker_relation.relation_flags &
++	    ~(XRT_SPACE_RELATION_LINEAR_VELOCITY_VALID_BIT | XRT_SPACE_RELATION_ANGULAR_VELOCITY_VALID_BIT));
 +
 +	return XRT_SUCCESS;
 +}
@@ -369,12 +434,15 @@ index 000000000..032232e76
 +	hmd->tracker = tracker;
 +	hmd->base.tracking_origin = tracker->tracking_origin;
 +
-+	hmd->offset_position.x = debug_get_float_option_optiforge_offset_x();
-+	hmd->offset_position.y = debug_get_float_option_optiforge_offset_y();
-+	hmd->offset_position.z = debug_get_float_option_optiforge_offset_z();
 +	hmd->yaw_deg = debug_get_float_option_optiforge_yaw();
 +	hmd->pitch_deg = debug_get_float_option_optiforge_pitch();
 +	hmd->roll_deg = debug_get_float_option_optiforge_roll();
++	hmd->forward_cm = debug_get_float_option_optiforge_forward_correction();
++	hmd->center_cm = debug_get_float_option_optiforge_center_correction();
++	hmd->height_cm = debug_get_float_option_optiforge_height_correction();
++	hmd->invert_yaw = debug_get_bool_option_optiforge_invert_yaw();
++	hmd->invert_pitch = debug_get_bool_option_optiforge_invert_pitch();
++	hmd->invert_roll = debug_get_bool_option_optiforge_invert_roll();
 +
 +	// This list should be ordered, most preferred first.
 +	size_t idx = 0;
@@ -403,19 +471,25 @@ index 000000000..032232e76
 +	u_distortion_mesh_set_none(&hmd->base);
 +
 +	OF_INFO(hmd, "Using tracker '%s' (%s)", tracker->serial, tracker->str);
-+	OF_INFO(hmd, "Tracker offset: %f %f %f, rotation (yaw pitch roll): %f %f %f", hmd->offset_position.x,
-+	        hmd->offset_position.y, hmd->offset_position.z, hmd->yaw_deg, hmd->pitch_deg, hmd->roll_deg);
++	OF_INFO(hmd, "Tracker rotation (yaw pitch roll): %f %f %f", hmd->yaw_deg, hmd->pitch_deg, hmd->roll_deg);
++	OF_INFO(hmd, "Sensor correction (cm): forward %f, center %f, height %f; invert yaw/pitch/roll: %d %d %d",
++	        hmd->forward_cm, hmd->center_cm, hmd->height_cm, hmd->invert_yaw, hmd->invert_pitch, hmd->invert_roll);
 +	OF_INFO(hmd, "Panel %dx%d @ %.2f Hz, rotation %s, eyes %s, FOV %.1f deg", PANEL_W_PIXELS, PANEL_H_PIXELS,
 +	        refresh_hz, debug_get_option_optiforge_panel_rotation(), swap_eyes ? "swapped" : "normal",
 +	        debug_get_float_option_optiforge_fov());
 +
-+	// Setup variable tracker, the offset can be tuned live in the debug GUI.
++	// Setup variable tracker, the rotation, corrections and inversion can be tuned live in the debug GUI.
 +	u_var_add_root(hmd, "Optiforge HMD", true);
 +	u_var_add_log_level(hmd, &hmd->log_level, "log_level");
-+	u_var_add_vec3_f32(hmd, &hmd->offset_position, "Tracker offset (m)");
 +	u_var_add_f32(hmd, &hmd->yaw_deg, "Tracker yaw (deg)");
 +	u_var_add_f32(hmd, &hmd->pitch_deg, "Tracker pitch (deg)");
 +	u_var_add_f32(hmd, &hmd->roll_deg, "Tracker roll (deg)");
++	u_var_add_f32(hmd, &hmd->forward_cm, "Forward correction (cm)");
++	u_var_add_f32(hmd, &hmd->center_cm, "Center correction (cm)");
++	u_var_add_f32(hmd, &hmd->height_cm, "Height correction (cm)");
++	u_var_add_bool(hmd, &hmd->invert_yaw, "Invert yaw");
++	u_var_add_bool(hmd, &hmd->invert_pitch, "Invert pitch");
++	u_var_add_bool(hmd, &hmd->invert_roll, "Invert roll");
 +
 +	return &hmd->base;
 +}

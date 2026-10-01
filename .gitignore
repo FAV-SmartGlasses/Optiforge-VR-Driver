@@ -33,3 +33,5 @@ build-win
 *.exe
 *.out
 *.app
+
+context.txt
