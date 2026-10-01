@@ -37,8 +37,11 @@ Leave "Use development profiles" off. In Preferences, set the environment variab
 | `LH_DRIVER` | `survive` | Use libsurvive for lighthouse tracking |
 | `OPTIFORGE_HMD` | `1` | Create the Optiforge HMD |
 | `OPTIFORGE_TRACKER_SERIAL` | `LHR-8BD7C17A` | Tracker on the headset (empty = first tracker found) |
-| `OPTIFORGE_TRACKER_OFFSET_X/Y/Z` | metres, default 0 | Head (centre between the eyes) position in the tracker's axes |
 | `OPTIFORGE_TRACKER_YAW/PITCH/ROLL` | degrees, default 0 | Head rotation relative to the tracker (Y, X, Z, same as the SteamVR driver) |
+| `OPTIFORGE_INVERT_YAW/PITCH/ROLL` | `1` | Invert that axis of the head rotation, like "invert mouse" in games |
+| `OPTIFORGE_FORWARD_CORRECTION` | cm, default 0 | How far the sensor is in front of the eyes (e.g. `11.5`) |
+| `OPTIFORGE_CENTER_CORRECTION` | cm, default 0 | How far the sensor is to the wearer's right of the centre between the eyes (e.g. `3.5`; negative = to the left) |
+| `OPTIFORGE_HEIGHT_CORRECTION` | cm, default 0 | How far the sensor is above the eyes (negative = below) |
 | `OPTIFORGE_PANEL_ROTATION` | `none` (default), `left`, `right` | `none`: eyes are the left/right halves of the portrait panel. `left`/`right`: eyes are the top/bottom halves, image rotated 90° |
 | `OPTIFORGE_SWAP_EYES` | `1` | Swap which panel half is the left eye |
 | `OPTIFORGE_FOV` | degrees, default 90 | Horizontal FOV per eye; vertical follows the aspect ratio |
@@ -46,7 +49,7 @@ Leave "Use development profiles" off. In Preferences, set the environment variab
 
 Remove `QWERTY_ENABLE`: the QWERTY builder is picked before the lighthouse builder when it is set.
 
-The tracker must be on and connected when Monado starts. The tracker offset and rotation can also be tuned live in the
+The tracker must be on and connected when Monado starts. The tracker rotation, axis inversion and sensor corrections can also be tuned live in the
 Monado debug GUI ("Optiforge HMD").
 
 Monado log lines to look for: `Using builder lighthouse`, `Using tracker 'LHR-8BD7C17A'`, and `head: Optiforge HMD`.
