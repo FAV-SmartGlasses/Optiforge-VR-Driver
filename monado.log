@@ -1,0 +1,1837 @@
+DEBUG [u_metrics_init] No metrics file!
+ INFO [ipc_server_main_common] Monado(XRT) by Collabora et al 'v25.1.0-857-ge936b6a53' starting up...
+DEBUG [create_listen_socket] Created listening socket /run/user/1000/monado_comp_ipc.
+DEBUG [init_listen_socket] Listening socket is fd 8
+ INFO [print_linux_end_user_started_information] 
+################################################################################
+#                                                                              #
+#                        The Monado service has started.                       #
+#                                                                              #
+################################################################################
+ INFO [get_obj] JSON does not contain node 'active'!
+ INFO [get_obj] JSON does not contain node 'camera_name'!
+ INFO [get_obj] JSON does not contain node 'camera_mode'!
+ INFO [get_obj] JSON does not contain node 'camera_type'!
+ INFO [get_obj] JSON does not contain node 'calibration_path'!
+Info: Loaded drivers: HTCVive
+Info: Adding tracked object KN0 from HTC
+Info: Adding tracked object WM0 from HTC
+Info: Device KN0 has watchman FW version 1641455124 and FPGA version 538/7/2; named '                   WMBUILD-W64$'. Hardware id 0xf1040009 Board rev: 3 (len 56)
+Warning: The detected version for device KN0 is 1641455124; the latest that is verified to work is 1632556731. You may have to upgrade libsurvive to support this device.
+Info: Device WM0 has watchman FW version 1693638519 and FPGA version 538/10/2; named '                   WMBUILD-W64$'. Hardware id 0x110e0009 Board rev: 3 (len 56)
+Warning: The detected version for device WM0 is 1693638519; the latest that is verified to work is 1632556731. You may have to upgrade libsurvive to support this device.
+ INFO [optiforge_hmd_create] Using tracker 'LHR-967FB3F2' (Tundra Tracker Gen3 (libsurvive))
+ INFO [optiforge_hmd_create] Tracker rotation (yaw pitch roll): 0.000000 180.000000 90.000000
+ INFO [optiforge_hmd_create] Sensor correction (cm): forward 0.000000, center -3.500000, height 0.000000; invert yaw/pitch/roll: 0 0 0
+ INFO [optiforge_hmd_create] Panel 1080x1920 @ 60.00 Hz, rotation right, eyes normal, FOV 90.0 deg
+Info: Detected LH gen 2 system.
+Info: LightcapMode (KN0) 1 -> 2 (ff)
+Info: LightcapMode (WM0) 1 -> 2 (ff)
+Info: OOTX not set for LH in channel 1; attaching ootx decoder using device KN0
+DEBUG [b_system_devices_static_finalize] Devices:
+	-1: (nil)
+	0: 0x558cbb8fd130
+	-1: (nil)
+ INFO [p_create_system] Creating system:
+	Builders:
+		qwerty: Qwerty devices builder
+		remote: Remote simulation devices builder
+		simulated: Simulated devices builder
+		rift: Oculus Rift
+		rift_s: Oculus Rift S
+		psvr2: PlayStation VR 2
+		rgb_tracking: RGB tracking based devices (PSVR, PSMV, ...)
+		steamvr: SteamVR proprietary wrapper (Vive, Index, Tundra trackers, etc.) devices builder
+		lighthouse: Lighthouse-tracked FLOSS (Vive, Index, Tundra trackers, etc.) devices builder
+		north_star: North Star headset
+		wmr: Windows Mixed Reality
+		xreal_air: Xreal Air
+		legacy: Legacy probing system
+	No builder selected in config (or wasn't compiled in)
+	Selected lighthouse because it was certain it could create a head
+	Using builder lighthouse: Lighthouse-tracked FLOSS (Vive, Index, Tundra trackers, etc.) devices builder
+	Got devices:
+		 0: 'Valve Index Right Controller (libsurvive)' (id=2)
+		 1: 'Tundra Tracker Gen3 (libsurvive)' (id=1)
+		 2: 'Optiforge HMD' (id=3)
+	In roles:
+		head: Optiforge HMD (Optiforge HMD), view count: 2
+		eyes: <none> (<none>)
+		face: <none> (<none>)
+		left: <none> (<none>)
+		right: Valve Index Right Controller (libsurvive) (LHR-156E7AC9)
+		gamepad: <none> (<none>)
+		hand_tracking.unobstructed.left: <none> (<none>)
+		hand_tracking.unobstructed.right: <none> (<none>)
+		hand_tracking.conforming.left: <none> (<none>)
+		hand_tracking.conforming.right: Valve Index Right Controller (libsurvive) (LHR-156E7AC9)
+	Result: XRT_SUCCESS
+DEBUG [comp_main_create_system_compositor] Doing init 0x558cbb982c40
+DEBUG [compositor_check_deferred] Deferred target backend X11(XCB) Windowed selected!
+ WARN [build_extension_list] Duplicate extension VK_KHR_get_surface_capabilities2 not added twice
+DEBUG [should_skip_optional_instance_ext] Skipping optional instance extension VK_EXT_display_surface_counter because VK_KHR_display is not enabled
+ INFO [vk_log_extension_list] Vulkan instance extensions list(s):
+	Enabled extensions:
+		VK_KHR_external_fence_capabilities        required
+		VK_KHR_external_memory_capabilities       required
+		VK_KHR_external_semaphore_capabilities    required
+		VK_KHR_get_physical_device_properties2    required
+		VK_KHR_get_surface_capabilities2          optional
+		VK_KHR_surface                            required
+		VK_KHR_xcb_surface                        required
+		VK_KHR_xlib_surface                       required
+		VK_EXT_debug_report                       required
+		VK_EXT_swapchain_colorspace               optional
+	Not enabled optional extensions:
+		VK_EXT_display_surface_counter            skipped
+DEBUG [select_physical_device] Choosing Vulkan device index
+DEBUG [select_physical_device] Available GPUs
+DEBUG [vk_print_device_info] GPU index 0
+	name: Quadro M2000M
+	vendor: 0x10de
+	product: 0x13b0
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.312
+	driverVersion: 0x912c8100
+DEBUG [vk_print_device_info] Selected GPU: 0
+	name: Quadro M2000M
+	vendor: 0x10de
+	product: 0x13b0
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.312
+	driverVersion: 0x912c8100
+DEBUG [should_skip_optional_device_ext] Skipping optional instance extension VK_EXT_display_control because VK_EXT_display_surface_counter instance ext is not enabled
+DEBUG [vk_log_extension_list] Vulkan device extensions list(s):
+	Enabled extensions:
+		VK_KHR_calibrated_timestamps       optional
+		VK_KHR_dedicated_allocation        required
+		VK_KHR_external_fence              required
+		VK_KHR_external_fence_fd           optional
+		VK_KHR_external_memory             required
+		VK_KHR_external_memory_fd          required
+		VK_KHR_external_semaphore          required
+		VK_KHR_external_semaphore_fd       optional
+		VK_KHR_format_feature_flags2       optional
+		VK_KHR_get_memory_requirements2    required
+		VK_KHR_global_priority             optional
+		VK_KHR_image_format_list           optional
+		VK_KHR_maintenance1                optional
+		VK_KHR_maintenance2                optional
+		VK_KHR_present_id                  optional
+		VK_KHR_present_wait                optional
+		VK_KHR_shared_presentable_image    optional
+		VK_KHR_swapchain                   required
+		VK_KHR_synchronization2            optional
+		VK_KHR_timeline_semaphore          optional
+		VK_EXT_calibrated_timestamps       optional
+		VK_EXT_global_priority             optional
+		VK_EXT_robustness2                 optional
+	Not enabled optional extensions:
+		VK_GOOGLE_display_timing           unsupported
+		VK_KHR_present_id2                 unsupported
+		VK_KHR_present_wait2               unsupported
+		VK_EXT_display_control             skipped
+DEBUG [filter_device_features] Features:
+	ext_fmt_resolve: 0
+	null_descriptor: 1
+	present_wait: 1
+	presnet_wait2: 0
+	shader_image_gather_extended: 1
+	shader_storage_image_write_without_format: 1
+	storage_buffer_8bit_access: 0
+	synchronization_2: 1
+	timeline_semaphore: 1
+	video_maintenance_1: 0
+DEBUG [vk_create_device] Is CAP_SYS_NICE set? Try: sudo setcap cap_sys_nice+ep monado-service
+DEBUG [select_physical_device] Choosing Vulkan device index
+DEBUG [select_physical_device] Available GPUs
+DEBUG [vk_print_device_info] GPU index 0
+	name: Quadro M2000M
+	vendor: 0x10de
+	product: 0x13b0
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.312
+	driverVersion: 0x912c8100
+DEBUG [vk_print_device_info] Selected GPU: 0
+	name: Quadro M2000M
+	vendor: 0x10de
+	product: 0x13b0
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.312
+	driverVersion: 0x912c8100
+DEBUG [should_skip_optional_device_ext] Skipping optional instance extension VK_EXT_display_control because VK_EXT_display_surface_counter instance ext is not enabled
+DEBUG [vk_log_extension_list] Vulkan device extensions list(s):
+	Enabled extensions:
+		VK_KHR_calibrated_timestamps       optional
+		VK_KHR_dedicated_allocation        required
+		VK_KHR_external_fence              required
+		VK_KHR_external_fence_fd           optional
+		VK_KHR_external_memory             required
+		VK_KHR_external_memory_fd          required
+		VK_KHR_external_semaphore          required
+		VK_KHR_external_semaphore_fd       optional
+		VK_KHR_format_feature_flags2       optional
+		VK_KHR_get_memory_requirements2    required
+		VK_KHR_global_priority             optional
+		VK_KHR_image_format_list           optional
+		VK_KHR_maintenance1                optional
+		VK_KHR_maintenance2                optional
+		VK_KHR_present_id                  optional
+		VK_KHR_present_wait                optional
+		VK_KHR_shared_presentable_image    optional
+		VK_KHR_swapchain                   required
+		VK_KHR_synchronization2            optional
+		VK_KHR_timeline_semaphore          optional
+		VK_EXT_calibrated_timestamps       optional
+		VK_EXT_global_priority             optional
+		VK_EXT_robustness2                 optional
+	Not enabled optional extensions:
+		VK_GOOGLE_display_timing           unsupported
+		VK_KHR_present_id2                 unsupported
+		VK_KHR_present_wait2               unsupported
+		VK_EXT_display_control             skipped
+DEBUG [filter_device_features] Features:
+	ext_fmt_resolve: 0
+	null_descriptor: 1
+	present_wait: 1
+	presnet_wait2: 0
+	shader_image_gather_extended: 1
+	shader_storage_image_write_without_format: 1
+	storage_buffer_8bit_access: 0
+	synchronization_2: 1
+	timeline_semaphore: 1
+	video_maintenance_1: 0
+ INFO [create_device] Created device and COMPUTE queue with QUEUE_GLOBAL_PRIORITY_HIGH.
+ INFO [vk_print_device_info] Device info:
+	name: Quadro M2000M
+	vendor: 0x10de
+	product: 0x13b0
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.312
+	driverVersion: 0x912c8100
+ INFO [vk_print_queues_info] Selected Queues/Families:
+	main_queue.queue: 0x558cbbc6eca0
+	main_queue.index: 0
+	main_queue.family_index: 0
+	encode_queue.queue: (nil)
+	encode_queue.index: -1
+	encode_queue.family_index: -1
+ INFO [vk_print_features_info] Features:
+	timestamp_compute_and_graphics: true
+	timestamp_period: 1.000000
+	timestamp_valid_bits: 64
+	timeline_semaphore: true
+ INFO [vk_print_external_handles_info] Supported images:
+	VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:
+		color import=true export=true
+		depth import=true export=true
+ INFO [vk_print_external_handles_info] Supported fences:
+	VK_EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT: true
+	VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT: true
+ INFO [vk_print_external_handles_info] Supported semaphores:
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT(binary): true
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT(binary): true
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT(timeline): false
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT(timeline): true
+DEBUG [fill_in_results] Selected 0 with uuid: 5c de 26 bd 6e 3c a2 4c 72 60 a6 7c f2 cb 34 fd 
+DEBUG [fill_in_results] Suggest 0 with uuid: 5c de 26 bd 6e 3c a2 4c 72 60 a6 7c f2 cb 34 fd to clients
+DEBUG [render_shaders_load] Shaders loaded!
+ INFO [render_resources_init] New renderer initialized!
+DEBUG [comp_main_create_system_compositor] Done 0x558cbb982c40
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_R16G16B16_UNORM' cannot be sampled from in optimal layout!
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_R16G16B16_SFLOAT' cannot be sampled from in optimal layout!
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_R8G8B8_SRGB' cannot be sampled from in optimal layout!
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_R8G8B8_UNORM' cannot be sampled from in optimal layout!
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_B8G8R8_UNORM' cannot be sampled from in optimal layout!
+DEBUG [vk_csci_is_format_supported] Format 'VK_FORMAT_S8_UINT' cannot be sampled from in optimal layout!
+ INFO [comp_vulkan_formats_log] Supported formats:
+	VK_FORMAT_R16G16B16A16_UNORM: true
+	VK_FORMAT_R16G16B16A16_SFLOAT: true
+	VK_FORMAT_R16G16B16_UNORM: false
+	VK_FORMAT_R16G16B16_SFLOAT: false
+	VK_FORMAT_R8G8B8A8_SRGB: true
+	VK_FORMAT_B8G8R8A8_SRGB: true
+	VK_FORMAT_R8G8B8_SRGB: false
+	VK_FORMAT_R8G8B8A8_UNORM: true
+	VK_FORMAT_B8G8R8A8_UNORM: true
+	VK_FORMAT_R8G8B8_UNORM: false
+	VK_FORMAT_B8G8R8_UNORM: false
+	VK_FORMAT_R5G6B5_UNORM_PACK16: true
+	VK_FORMAT_R32_SFLOAT: true
+	VK_FORMAT_D32_SFLOAT: true
+	VK_FORMAT_D16_UNORM: true
+	VK_FORMAT_X8_D24_UNORM_PACK32: true
+	VK_FORMAT_D24_UNORM_S8_UINT: true
+	VK_FORMAT_D32_SFLOAT_S8_UINT: true
+	VK_FORMAT_S8_UINT: false
+ INFO [u_linux_try_to_set_realtime_priority_on_thread] Raised priority of thread 'Multi Client Module' to policy: 'SCHED_FIFO', priority: '99'
+ INFO [client_connected] Client 1 connected
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 1
+	application_name: 'envision-openxr-prober'
+	pid: 5147
+	extensions:
+		ext_hand_tracking_enabled: false
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: false
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		meta_body_tracking_fidelity_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+ INFO [client_disconnected] Client 1 disconnected
+ INFO [client_connected] Client 2 connected
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 2
+	application_name: 'libmonado'
+	pid: 5147
+	extensions:
+		ext_hand_tracking_enabled: false
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: false
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		meta_body_tracking_fidelity_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+ INFO [client_connected] Client 3 connected
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 3
+	application_name: 'steam'
+	pid: 11388
+	extensions:
+		ext_hand_tracking_enabled: true
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: false
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		meta_body_tracking_fidelity_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+DEBUG [ref_space_inc] Ref-space view in use
+DEBUG [ref_space_inc] Ref-space local in use
+DEBUG [ref_space_inc] Ref-space stage in use
+DEBUG [compositor_begin_session] BEGIN_SESSION
+DEBUG [create_target] Using VK_PRESENT_MODE_IMMEDIATE_KHR for xcb window
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 1: DP-1: 1080x1920
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 3: DP-3: 3840x2160
+ WARN [comp_window_xcb_init] Selected display 0 has no size
+DEBUG [select_new_current_display] Select new current display 1: DP-1
+ WARN [comp_window_xcb_init] Falling back to display 1: DP-1
+DEBUG [comp_window_xcb_init] Setting window size 1080x1920.
+ INFO [comp_target_swapchain_override_extents] Target 'xcb' overrides compositor extents with (1080x1920) was (0x0 false)
+DEBUG [compositor_try_window] Target backend xcb initialized!
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [renderer_ensure_images_and_renderings] Creating images and renderings (force_recreate: false).
+ INFO [u_pc_fake_create] Created pacer (non-feedback version aka "fake")
+	estimated_frame_period: 16.666667ms
+	percentage: 95.000000%
+	min_comp_time: 3.000000ms
+	comp_time: 15.833333ms
+DEBUG [find_surface_format] VkSurfaceFormatKHR
+	picked: [format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+	preferred: [format = VK_FORMAT_A2B10G10R10_UNORM_PACK32, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_surface_info] VkSurfaceKHR info:
+	caps.minImageCount: 3
+	caps.maxImageCount: 8
+	caps.currentExtent: 1080x1920
+	caps.minImageExtent: 1080x1920
+	caps.maxImageExtent: 1080x1920
+	caps.maxImageArrayLayers: 1
+	caps.supportedTransforms:
+		VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.currentTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.supportedCompositeAlpha:
+		VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	caps.supportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	present_modes(4):
+		VK_PRESENT_MODE_FIFO_KHR
+		VK_PRESENT_MODE_FIFO_RELAXED_KHR
+		VK_PRESENT_MODE_IMMEDIATE_KHR
+		VK_PRESENT_MODE_FIFO_LATEST_READY_KHR
+	present_id2_caps.presentId2Supported: 0
+	present_wait2_caps.presentWait2Supported: 0
+	shared_present_caps.sharedPresentSupportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	formats(2):
+		[format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+		[format = VK_FORMAT_B8G8R8A8_SRGB, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_swapchain_create_info] VkSwapchainCreateInfoKHR:
+	flags:
+	surface: 7f7b58001640
+	minImageCount: 3
+	imageFormat: VK_FORMAT_B8G8R8A8_UNORM
+	imageColorSpace: VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+	imageExtent: {1080, 1920}
+	imageArrayLayers: 1
+	imageUsage:
+		VK_IMAGE_USAGE_STORAGE_BIT
+	imageSharingMode: VK_SHARING_MODE_EXCLUSIVE
+	queueFamilyIndexCount: 0
+	preTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	compositeAlpha: VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	presentMode: VK_PRESENT_MODE_IMMEDIATE_KHR
+	clipped: VK_TRUE
+	oldSwapchain: 0
+ INFO [comp_target_swapchain_create_images] Not using vblank event thread!
+DEBUG [renderer_create_renderings_and_fences] Allocating 3 Command Buffers.
+ WARN [comp_window_peek_create] Peek window cannot be enabled on compute compositor
+ INFO [update_session_state_locked] Started native session, 1 active app session(s).
+DEBUG [ref_space_dec] Ref-space view no longer in use
+DEBUG [ref_space_dec] Ref-space local no longer in use
+DEBUG [ref_space_dec] Ref-space stage no longer in use
+DEBUG [update_session_state_locked] Stopping native session, 0 active app session(s).
+DEBUG [compositor_end_session] END_SESSION
+ INFO [client_disconnected] Client 3 disconnected
+ INFO [update_session_state_locked] Stopped native session, 0 active app session(s).
+ INFO [client_connected] Client 4 connected
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 4
+	application_name: 'wineopenxr test instance'
+	pid: 11388
+	extensions:
+		ext_hand_tracking_enabled: false
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: false
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		meta_body_tracking_fidelity_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+ INFO [client_disconnected] Client 4 disconnected
+ INFO [client_connected] Client 5 connected
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 5
+	application_name: 'Earth'
+	pid: 11469
+	extensions:
+		ext_hand_tracking_enabled: true
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: false
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		meta_body_tracking_fidelity_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+DEBUG [ref_space_inc] Ref-space view in use
+DEBUG [ref_space_inc] Ref-space local in use
+DEBUG [ref_space_inc] Ref-space stage in use
+DEBUG [compositor_begin_session] BEGIN_SESSION
+DEBUG [create_target] Using VK_PRESENT_MODE_IMMEDIATE_KHR for xcb window
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 1: DP-1: 1080x1920
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 3: DP-3: 3840x2160
+DEBUG [comp_window_xcb_init] Setting window size 1080x1920.
+ INFO [comp_target_swapchain_override_extents] Target 'xcb' overrides compositor extents with (1080x1920) was (0x0 false)
+DEBUG [compositor_try_window] Target backend xcb initialized!
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [renderer_ensure_images_and_renderings] Creating images and renderings (force_recreate: false).
+ INFO [u_pc_fake_create] Created pacer (non-feedback version aka "fake")
+	estimated_frame_period: 16.666667ms
+	percentage: 95.000000%
+	min_comp_time: 3.000000ms
+	comp_time: 15.833333ms
+DEBUG [find_surface_format] VkSurfaceFormatKHR
+	picked: [format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+	preferred: [format = VK_FORMAT_A2B10G10R10_UNORM_PACK32, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_surface_info] VkSurfaceKHR info:
+	caps.minImageCount: 3
+	caps.maxImageCount: 8
+	caps.currentExtent: 1080x1920
+	caps.minImageExtent: 1080x1920
+	caps.maxImageExtent: 1080x1920
+	caps.maxImageArrayLayers: 1
+	caps.supportedTransforms:
+		VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.currentTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.supportedCompositeAlpha:
+		VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	caps.supportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	present_modes(4):
+		VK_PRESENT_MODE_FIFO_KHR
+		VK_PRESENT_MODE_FIFO_RELAXED_KHR
+		VK_PRESENT_MODE_IMMEDIATE_KHR
+		VK_PRESENT_MODE_FIFO_LATEST_READY_KHR
+	present_id2_caps.presentId2Supported: 0
+	present_wait2_caps.presentWait2Supported: 0
+	shared_present_caps.sharedPresentSupportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	formats(2):
+		[format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+		[format = VK_FORMAT_B8G8R8A8_SRGB, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_swapchain_create_info] VkSwapchainCreateInfoKHR:
+	flags:
+	surface: 7f7b58001640
+	minImageCount: 3
+	imageFormat: VK_FORMAT_B8G8R8A8_UNORM
+	imageColorSpace: VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+	imageExtent: {1080, 1920}
+	imageArrayLayers: 1
+	imageUsage:
+		VK_IMAGE_USAGE_STORAGE_BIT
+	imageSharingMode: VK_SHARING_MODE_EXCLUSIVE
+	queueFamilyIndexCount: 0
+	preTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	compositeAlpha: VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	presentMode: VK_PRESENT_MODE_IMMEDIATE_KHR
+	clipped: VK_TRUE
+	oldSwapchain: 0
+ INFO [comp_target_swapchain_create_images] Not using vblank event thread!
+DEBUG [renderer_create_renderings_and_fences] Allocating 3 Command Buffers.
+ WARN [comp_window_peek_create] Peek window cannot be enabled on compute compositor
+ INFO [update_session_state_locked] Started native session, 1 active app session(s).
+DEBUG [ref_space_dec] Ref-space view no longer in use
+DEBUG [ref_space_dec] Ref-space local no longer in use
+DEBUG [ref_space_dec] Ref-space stage no longer in use
+DEBUG [update_session_state_locked] Stopping native session, 0 active app session(s).
+DEBUG [compositor_end_session] END_SESSION
+DEBUG [ref_space_inc] Ref-space view in use
+DEBUG [ref_space_inc] Ref-space local in use
+DEBUG [ref_space_inc] Ref-space stage in use
+ INFO [update_session_state_locked] Stopped native session, 0 active app session(s).
+DEBUG [compositor_begin_session] BEGIN_SESSION
+DEBUG [create_target] Using VK_PRESENT_MODE_IMMEDIATE_KHR for xcb window
+DEBUG [comp_swapchain_create_init] CREATE 0x7f7b6c02dea0 672x756 VK_FORMAT_R16G16B16A16_UNORM (91)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 0, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 0, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 0, required: 0)
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 1: DP-1: 1080x1920
+DEBUG [comp_window_xcb_get_randr_outputs] randr output 3: DP-3: 3840x2160
+DEBUG [comp_window_xcb_init] Setting window size 1080x1920.
+ INFO [comp_target_swapchain_override_extents] Target 'xcb' overrides compositor extents with (1080x1920) was (0x0 false)
+DEBUG [compositor_try_window] Target backend xcb initialized!
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [create_image] create_image: Use dedicated allocation: 1 (preferred: 1, required: 0)
+DEBUG [renderer_ensure_images_and_renderings] Creating images and renderings (force_recreate: false).
+ INFO [u_pc_fake_create] Created pacer (non-feedback version aka "fake")
+	estimated_frame_period: 16.666667ms
+	percentage: 95.000000%
+	min_comp_time: 3.000000ms
+	comp_time: 15.833333ms
+DEBUG [find_surface_format] VkSurfaceFormatKHR
+	picked: [format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+	preferred: [format = VK_FORMAT_A2B10G10R10_UNORM_PACK32, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_surface_info] VkSurfaceKHR info:
+	caps.minImageCount: 3
+	caps.maxImageCount: 8
+	caps.currentExtent: 1080x1920
+	caps.minImageExtent: 1080x1920
+	caps.maxImageExtent: 1080x1920
+	caps.maxImageArrayLayers: 1
+	caps.supportedTransforms:
+		VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.currentTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	caps.supportedCompositeAlpha:
+		VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	caps.supportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	present_modes(4):
+		VK_PRESENT_MODE_FIFO_KHR
+		VK_PRESENT_MODE_FIFO_RELAXED_KHR
+		VK_PRESENT_MODE_IMMEDIATE_KHR
+		VK_PRESENT_MODE_FIFO_LATEST_READY_KHR
+	present_id2_caps.presentId2Supported: 0
+	present_wait2_caps.presentWait2Supported: 0
+	shared_present_caps.sharedPresentSupportedUsageFlags:
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		VK_IMAGE_USAGE_STORAGE_BIT
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT
+	formats(2):
+		[format = VK_FORMAT_B8G8R8A8_UNORM, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+		[format = VK_FORMAT_B8G8R8A8_SRGB, colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR]
+ INFO [vk_print_swapchain_create_info] VkSwapchainCreateInfoKHR:
+	flags:
+	surface: 7f7b58001640
+	minImageCount: 3
+	imageFormat: VK_FORMAT_B8G8R8A8_UNORM
+	imageColorSpace: VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+	imageExtent: {1080, 1920}
+	imageArrayLayers: 1
+	imageUsage:
+		VK_IMAGE_USAGE_STORAGE_BIT
+	imageSharingMode: VK_SHARING_MODE_EXCLUSIVE
+	queueFamilyIndexCount: 0
+	preTransform: VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+	compositeAlpha: VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
+	presentMode: VK_PRESENT_MODE_IMMEDIATE_KHR
+	clipped: VK_TRUE
+	oldSwapchain: 0
+ INFO [comp_target_swapchain_create_images] Not using vblank event thread!
+DEBUG [renderer_create_renderings_and_fences] Allocating 3 Command Buffers.
+ WARN [comp_window_peek_create] Peek window cannot be enabled on compute compositor
+ INFO [update_session_state_locked] Started native session, 1 active app session(s).
+DEBUG [log_frame_time_diff] Frame late by 384.85ms!
+ INFO [init] Created hand tracker:
+	mode: system
+	hand: right
+	locked xdev: <none>
+	input count: 1
+	output count: 1
+	input[0]: XRT_INPUT_HT_CONFORMING_RIGHT xdev='Valve Index Right Controller (libsurvive)'
+DEBUG [log_frame_time_diff] Frame late by 600.00ms!
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.562884ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 166.896220ms (1649056859723)  (latest completed frame)
+	scheduled: 150.229553ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.473726ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 165.807062ms (1649056859723)  (latest completed frame)
+	scheduled: 149.140395ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.399620ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 164.732956ms (1649056859723)  (latest completed frame)
+	scheduled: 148.066289ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.307692ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 163.641028ms (1649056859723)  (latest completed frame)
+	scheduled: 146.974361ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.186934ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 162.520270ms (1649056859723)  (latest completed frame)
+	scheduled: 145.853603ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.083472ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 161.416808ms (1649056859723)  (latest completed frame)
+	scheduled: 144.750141ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.933454ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 160.266790ms (1649056859723)  (latest completed frame)
+	scheduled: 143.600123ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.825806ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 159.159142ms (1649056859723)  (latest completed frame)
+	scheduled: 142.492475ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.716868ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 158.050204ms (1649056859723)  (latest completed frame)
+	scheduled: 141.383537ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.570980ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 156.904316ms (1649056859723)  (latest completed frame)
+	scheduled: 140.237649ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.395691ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 155.729027ms (1649056859723)  (latest completed frame)
+	scheduled: 139.062360ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.225896ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 154.559232ms (1649056859723)  (latest completed frame)
+	scheduled: 137.892565ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.116039ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 153.449375ms (1649056859723)  (latest completed frame)
+	scheduled: 136.782708ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.995286ms (1648923526387) (next time for compositor to pick up frame)
+	progress: 152.328622ms (1649056859723)  (latest completed frame)
+	scheduled: 135.661955ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.539809ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 151.206478ms (1649056859723)  (latest completed frame)
+	scheduled: 134.539811ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.456920ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 150.123589ms (1649056859723)  (latest completed frame)
+	scheduled: 133.456922ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.368468ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 149.035137ms (1649056859723)  (latest completed frame)
+	scheduled: 132.368470ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.296486ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 147.963155ms (1649056859723)  (latest completed frame)
+	scheduled: 131.296488ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.219424ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 146.886093ms (1649056859723)  (latest completed frame)
+	scheduled: 130.219426ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.149653ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 145.816322ms (1649056859723)  (latest completed frame)
+	scheduled: 129.149655ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.082411ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 144.749080ms (1649056859723)  (latest completed frame)
+	scheduled: 128.082413ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.991209ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 143.657878ms (1649056859723)  (latest completed frame)
+	scheduled: 126.991211ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.837823ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 142.504492ms (1649056859723)  (latest completed frame)
+	scheduled: 125.837825ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.713146ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 141.379815ms (1649056859723)  (latest completed frame)
+	scheduled: 124.713148ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.573063ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 140.239732ms (1649056859723)  (latest completed frame)
+	scheduled: 123.573065ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.389908ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 139.056577ms (1649056859723)  (latest completed frame)
+	scheduled: 122.389910ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.240262ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 137.906931ms (1649056859723)  (latest completed frame)
+	scheduled: 121.240264ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.170827ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 136.837496ms (1649056859723)  (latest completed frame)
+	scheduled: 120.170829ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.025919ms (1648940193054) (next time for compositor to pick up frame)
+	progress: 135.692588ms (1649056859723)  (latest completed frame)
+	scheduled: 119.025921ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.481613ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 134.481615ms (1649056859723)  (latest completed frame)
+	scheduled: 117.814948ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.397147ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 133.397149ms (1649056859723)  (latest completed frame)
+	scheduled: 116.730482ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.320876ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 132.320878ms (1649056859723)  (latest completed frame)
+	scheduled: 115.654211ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.235806ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 131.235808ms (1649056859723)  (latest completed frame)
+	scheduled: 114.569141ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.164499ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 130.164501ms (1649056859723)  (latest completed frame)
+	scheduled: 113.497834ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.092879ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 129.092881ms (1649056859723)  (latest completed frame)
+	scheduled: 112.426214ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.034347ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 128.034349ms (1649056859723)  (latest completed frame)
+	scheduled: 111.367682ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.992508ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 126.992510ms (1649056859723)  (latest completed frame)
+	scheduled: 110.325843ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.841969ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 125.841971ms (1649056859723)  (latest completed frame)
+	scheduled: 109.175304ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.723879ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 124.723881ms (1649056859723)  (latest completed frame)
+	scheduled: 108.057214ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.624489ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 123.624491ms (1649056859723)  (latest completed frame)
+	scheduled: 106.957824ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.539508ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 122.539510ms (1649056859723)  (latest completed frame)
+	scheduled: 105.872843ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.421841ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 121.421843ms (1649056859723)  (latest completed frame)
+	scheduled: 104.755176ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.300692ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 120.300694ms (1649056859723)  (latest completed frame)
+	scheduled: 103.634027ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.196716ms (1648956859721) (next time for compositor to pick up frame)
+	progress: 119.196718ms (1649056859723)  (latest completed frame)
+	scheduled: 102.530051ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.761604ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 118.094939ms (1649056859723)  (latest completed frame)
+	scheduled: 101.428272ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.636317ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 116.969652ms (1649056859723)  (latest completed frame)
+	scheduled: 100.302985ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.541761ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 115.875096ms (1649056859723)  (latest completed frame)
+	scheduled: 99.208429ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.445749ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 114.779084ms (1649056859723)  (latest completed frame)
+	scheduled: 98.112417ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.309078ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 113.642413ms (1649056859723)  (latest completed frame)
+	scheduled: 96.975746ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.147145ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 112.480480ms (1649056859723)  (latest completed frame)
+	scheduled: 95.813813ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.043383ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 111.376718ms (1649056859723)  (latest completed frame)
+	scheduled: 94.710051ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.949829ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 110.283164ms (1649056859723)  (latest completed frame)
+	scheduled: 93.616497ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.788653ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 109.121988ms (1649056859723)  (latest completed frame)
+	scheduled: 92.455321ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.680057ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 108.013392ms (1649056859723)  (latest completed frame)
+	scheduled: 91.346725ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.577340ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 106.910675ms (1649056859723)  (latest completed frame)
+	scheduled: 90.244008ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.426476ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 105.759811ms (1649056859723)  (latest completed frame)
+	scheduled: 89.093144ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.242195ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 104.575530ms (1649056859723)  (latest completed frame)
+	scheduled: 87.908863ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.174961ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 103.508296ms (1649056859723)  (latest completed frame)
+	scheduled: 86.841629ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.049305ms (1648973526388) (next time for compositor to pick up frame)
+	progress: 102.382640ms (1649056859723)  (latest completed frame)
+	scheduled: 85.715973ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.585843ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 101.252511ms (1649056859723)  (latest completed frame)
+	scheduled: 84.585844ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.515514ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 100.182182ms (1649056859723)  (latest completed frame)
+	scheduled: 83.515515ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.414209ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 99.080877ms (1649056859723)  (latest completed frame)
+	scheduled: 82.414210ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.345947ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 98.012615ms (1649056859723)  (latest completed frame)
+	scheduled: 81.345948ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.294267ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 96.960935ms (1649056859723)  (latest completed frame)
+	scheduled: 80.294268ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.129550ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 95.796218ms (1649056859723)  (latest completed frame)
+	scheduled: 79.129551ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.986222ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 94.652890ms (1649056859723)  (latest completed frame)
+	scheduled: 77.986223ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.919159ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 93.585827ms (1649056859723)  (latest completed frame)
+	scheduled: 76.919160ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.828537ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 92.495205ms (1649056859723)  (latest completed frame)
+	scheduled: 75.828538ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.761385ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 91.428053ms (1649056859723)  (latest completed frame)
+	scheduled: 74.761386ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.679858ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 90.346526ms (1649056859723)  (latest completed frame)
+	scheduled: 73.679859ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.567800ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 89.234468ms (1649056859723)  (latest completed frame)
+	scheduled: 72.567801ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.502629ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 88.169297ms (1649056859723)  (latest completed frame)
+	scheduled: 71.502630ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.402214ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 87.068882ms (1649056859723)  (latest completed frame)
+	scheduled: 70.402215ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.260248ms (1648990193055) (next time for compositor to pick up frame)
+	progress: 85.926916ms (1649056859723)  (latest completed frame)
+	scheduled: 69.260249ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.838375ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 84.838376ms (1649056859723)  (latest completed frame)
+	scheduled: 68.171709ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.719219ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 83.719220ms (1649056859723)  (latest completed frame)
+	scheduled: 67.052553ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.651727ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 82.651728ms (1649056859723)  (latest completed frame)
+	scheduled: 65.985061ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.581332ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 81.581333ms (1649056859723)  (latest completed frame)
+	scheduled: 64.914666ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.514249ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 80.514250ms (1649056859723)  (latest completed frame)
+	scheduled: 63.847583ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.436075ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 79.436076ms (1649056859723)  (latest completed frame)
+	scheduled: 62.769409ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.354869ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 78.354870ms (1649056859723)  (latest completed frame)
+	scheduled: 61.688203ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.280476ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 77.280477ms (1649056859723)  (latest completed frame)
+	scheduled: 60.613810ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.092586ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 76.092587ms (1649056859723)  (latest completed frame)
+	scheduled: 59.425920ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.915548ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 74.915549ms (1649056859723)  (latest completed frame)
+	scheduled: 58.248882ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.842164ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 73.842165ms (1649056859723)  (latest completed frame)
+	scheduled: 57.175498ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.716563ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 72.716564ms (1649056859723)  (latest completed frame)
+	scheduled: 56.049897ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.513471ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 71.513472ms (1649056859723)  (latest completed frame)
+	scheduled: 54.846805ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.363873ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 70.363874ms (1649056859723)  (latest completed frame)
+	scheduled: 53.697207ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.179199ms (1649006859722) (next time for compositor to pick up frame)
+	progress: 69.179200ms (1649056859723)  (latest completed frame)
+	scheduled: 52.512533ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.779735ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 68.113069ms (1649056859723)  (latest completed frame)
+	scheduled: 51.446402ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.707657ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 67.040991ms (1649056859723)  (latest completed frame)
+	scheduled: 50.374324ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.570243ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 65.903577ms (1649056859723)  (latest completed frame)
+	scheduled: 49.236910ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.486394ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 64.819728ms (1649056859723)  (latest completed frame)
+	scheduled: 48.153061ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.413342ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 63.746676ms (1649056859723)  (latest completed frame)
+	scheduled: 47.080009ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.331365ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 62.664699ms (1649056859723)  (latest completed frame)
+	scheduled: 45.998032ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.205817ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 61.539151ms (1649056859723)  (latest completed frame)
+	scheduled: 44.872484ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.104715ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 60.438049ms (1649056859723)  (latest completed frame)
+	scheduled: 43.771382ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.019498ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 59.352832ms (1649056859723)  (latest completed frame)
+	scheduled: 42.686165ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.866503ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 58.199837ms (1649056859723)  (latest completed frame)
+	scheduled: 41.533170ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.800160ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 57.133494ms (1649056859723)  (latest completed frame)
+	scheduled: 40.466827ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.690848ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 56.024182ms (1649056859723)  (latest completed frame)
+	scheduled: 39.357515ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.619109ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 54.952443ms (1649056859723)  (latest completed frame)
+	scheduled: 38.285776ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.546638ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 53.879972ms (1649056859723)  (latest completed frame)
+	scheduled: 37.213305ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.461075ms (1649023526389) (next time for compositor to pick up frame)
+	progress: 52.794409ms (1649056859723)  (latest completed frame)
+	scheduled: 36.127742ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 35.031581ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 51.698248ms (1649056859723)  (latest completed frame)
+	scheduled: 35.031581ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.850200ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 50.516867ms (1649056859723)  (latest completed frame)
+	scheduled: 33.850200ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.724064ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 49.390731ms (1649056859723)  (latest completed frame)
+	scheduled: 32.724064ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.634272ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 48.300939ms (1649056859723)  (latest completed frame)
+	scheduled: 31.634272ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.525063ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 47.191730ms (1649056859723)  (latest completed frame)
+	scheduled: 30.525063ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.445487ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 46.112154ms (1649056859723)  (latest completed frame)
+	scheduled: 29.445487ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.350732ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 45.017399ms (1649056859723)  (latest completed frame)
+	scheduled: 28.350732ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.257288ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 43.923955ms (1649056859723)  (latest completed frame)
+	scheduled: 27.257288ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.158908ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 42.825575ms (1649056859723)  (latest completed frame)
+	scheduled: 26.158908ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.046436ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 41.713103ms (1649056859723)  (latest completed frame)
+	scheduled: 25.046436ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.951760ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 40.618427ms (1649056859723)  (latest completed frame)
+	scheduled: 23.951760ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.879276ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 39.545943ms (1649056859723)  (latest completed frame)
+	scheduled: 22.879276ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.746810ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 38.413477ms (1649056859723)  (latest completed frame)
+	scheduled: 21.746810ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.587045ms (1649040193056) (next time for compositor to pick up frame)
+	progress: 37.253712ms (1649056859723)  (latest completed frame)
+	scheduled: 20.587045ms (1649040193056) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.223389ms (1649056859723) (next time for compositor to pick up frame)
+	progress: 136.890058ms (1649173526392)  (latest completed frame)
+	scheduled: 20.223389ms (1649056859723) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.929860ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 114.263195ms (1649190193059)  (latest completed frame)
+	scheduled: 97.596528ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.811905ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 113.145240ms (1649190193059)  (latest completed frame)
+	scheduled: 96.478573ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.743007ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 112.076342ms (1649190193059)  (latest completed frame)
+	scheduled: 95.409675ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.655238ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 110.988573ms (1649190193059)  (latest completed frame)
+	scheduled: 94.321906ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.518391ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 109.851726ms (1649190193059)  (latest completed frame)
+	scheduled: 93.185059ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.373162ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 108.706497ms (1649190193059)  (latest completed frame)
+	scheduled: 92.039830ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.227452ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 107.560787ms (1649190193059)  (latest completed frame)
+	scheduled: 90.894120ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.159812ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 106.493147ms (1649190193059)  (latest completed frame)
+	scheduled: 89.826480ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.089568ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 105.422903ms (1649190193059)  (latest completed frame)
+	scheduled: 88.756236ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.931623ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 104.264958ms (1649190193059)  (latest completed frame)
+	scheduled: 87.598291ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.771441ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 103.104776ms (1649190193059)  (latest completed frame)
+	scheduled: 86.438109ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.677239ms (1649106859724) (next time for compositor to pick up frame)
+	progress: 102.010574ms (1649190193059)  (latest completed frame)
+	scheduled: 85.343907ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.248497ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 100.915165ms (1649190193059)  (latest completed frame)
+	scheduled: 84.248498ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.119353ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 99.786021ms (1649190193059)  (latest completed frame)
+	scheduled: 83.119354ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.961176ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 98.627844ms (1649190193059)  (latest completed frame)
+	scheduled: 81.961177ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.853492ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 97.520160ms (1649190193059)  (latest completed frame)
+	scheduled: 80.853493ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.780980ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 96.447648ms (1649190193059)  (latest completed frame)
+	scheduled: 79.780981ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.714033ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 95.380701ms (1649190193059)  (latest completed frame)
+	scheduled: 78.714034ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.531961ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 94.198629ms (1649190193059)  (latest completed frame)
+	scheduled: 77.531962ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.425583ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 93.092251ms (1649190193059)  (latest completed frame)
+	scheduled: 76.425584ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.279778ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 91.946446ms (1649190193059)  (latest completed frame)
+	scheduled: 75.279779ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.107154ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 90.773822ms (1649190193059)  (latest completed frame)
+	scheduled: 74.107155ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.038808ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 89.705476ms (1649190193059)  (latest completed frame)
+	scheduled: 73.038809ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.941230ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 88.607898ms (1649190193059)  (latest completed frame)
+	scheduled: 71.941231ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.874705ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 87.541373ms (1649190193059)  (latest completed frame)
+	scheduled: 70.874706ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.776367ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 86.443035ms (1649190193059)  (latest completed frame)
+	scheduled: 69.776368ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.601991ms (1649123526391) (next time for compositor to pick up frame)
+	progress: 85.268659ms (1649190193059)  (latest completed frame)
+	scheduled: 68.601992ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.183964ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 84.183965ms (1649190193059)  (latest completed frame)
+	scheduled: 67.517298ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.114926ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 83.114927ms (1649190193059)  (latest completed frame)
+	scheduled: 66.448260ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.010073ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 82.010074ms (1649190193059)  (latest completed frame)
+	scheduled: 65.343407ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.915925ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 80.915926ms (1649190193059)  (latest completed frame)
+	scheduled: 64.249259ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.795360ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 79.795361ms (1649190193059)  (latest completed frame)
+	scheduled: 63.128694ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.715483ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 78.715484ms (1649190193059)  (latest completed frame)
+	scheduled: 62.048817ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.578548ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 77.578549ms (1649190193059)  (latest completed frame)
+	scheduled: 60.911882ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.481892ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 76.481893ms (1649190193059)  (latest completed frame)
+	scheduled: 59.815226ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.369271ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 75.369272ms (1649190193059)  (latest completed frame)
+	scheduled: 58.702605ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.274370ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 74.274371ms (1649190193059)  (latest completed frame)
+	scheduled: 57.607704ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.129628ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 73.129629ms (1649190193059)  (latest completed frame)
+	scheduled: 56.462962ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.992982ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 71.992983ms (1649190193059)  (latest completed frame)
+	scheduled: 55.326316ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.909351ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 70.909352ms (1649190193059)  (latest completed frame)
+	scheduled: 54.242685ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.758856ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 69.758857ms (1649190193059)  (latest completed frame)
+	scheduled: 53.092190ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.645732ms (1649140193058) (next time for compositor to pick up frame)
+	progress: 68.645733ms (1649190193059)  (latest completed frame)
+	scheduled: 51.979066ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.210454ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 67.543788ms (1649190193059)  (latest completed frame)
+	scheduled: 50.877121ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.082626ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 66.415960ms (1649190193059)  (latest completed frame)
+	scheduled: 49.749293ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.965972ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 65.299306ms (1649190193059)  (latest completed frame)
+	scheduled: 48.632639ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.846405ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 64.179739ms (1649190193059)  (latest completed frame)
+	scheduled: 47.513072ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.771508ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 63.104842ms (1649190193059)  (latest completed frame)
+	scheduled: 46.438175ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.685013ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 62.018347ms (1649190193059)  (latest completed frame)
+	scheduled: 45.351680ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.605007ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 60.938341ms (1649190193059)  (latest completed frame)
+	scheduled: 44.271674ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.534614ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 59.867948ms (1649190193059)  (latest completed frame)
+	scheduled: 43.201281ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.467122ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 58.800456ms (1649190193059)  (latest completed frame)
+	scheduled: 42.133789ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.346182ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 57.679516ms (1649190193059)  (latest completed frame)
+	scheduled: 41.012849ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.180585ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 56.513919ms (1649190193059)  (latest completed frame)
+	scheduled: 39.847252ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.084623ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 55.417957ms (1649190193059)  (latest completed frame)
+	scheduled: 38.751290ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.913906ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 54.247240ms (1649190193059)  (latest completed frame)
+	scheduled: 37.580573ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.794396ms (1649156859725) (next time for compositor to pick up frame)
+	progress: 53.127730ms (1649190193059)  (latest completed frame)
+	scheduled: 36.461063ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 35.366413ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 52.033080ms (1649190193059)  (latest completed frame)
+	scheduled: 35.366413ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.229595ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 50.896262ms (1649190193059)  (latest completed frame)
+	scheduled: 34.229595ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.072865ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 49.739532ms (1649190193059)  (latest completed frame)
+	scheduled: 33.072865ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.902682ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 48.569349ms (1649190193059)  (latest completed frame)
+	scheduled: 31.902682ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.739701ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 47.406368ms (1649190193059)  (latest completed frame)
+	scheduled: 30.739701ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.668607ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 46.335274ms (1649190193059)  (latest completed frame)
+	scheduled: 29.668607ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.595295ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 45.261962ms (1649190193059)  (latest completed frame)
+	scheduled: 28.595295ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.528137ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 44.194804ms (1649190193059)  (latest completed frame)
+	scheduled: 27.528137ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.460433ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 43.127100ms (1649190193059)  (latest completed frame)
+	scheduled: 26.460433ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.352751ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 42.019418ms (1649190193059)  (latest completed frame)
+	scheduled: 25.352751ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.284137ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 40.950804ms (1649190193059)  (latest completed frame)
+	scheduled: 24.284137ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.215436ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 39.882103ms (1649190193059)  (latest completed frame)
+	scheduled: 23.215436ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.148309ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 38.814976ms (1649190193059)  (latest completed frame)
+	scheduled: 22.148309ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.082126ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 37.748793ms (1649190193059)  (latest completed frame)
+	scheduled: 21.082126ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.955447ms (1649173526392) (next time for compositor to pick up frame)
+	progress: 36.622114ms (1649190193059)  (latest completed frame)
+	scheduled: 19.955447ms (1649173526392) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.881256ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 82.881257ms (1649273526394)  (latest completed frame)
+	scheduled: 66.214590ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.726485ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 81.726486ms (1649273526394)  (latest completed frame)
+	scheduled: 65.059819ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.585986ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 80.585987ms (1649273526394)  (latest completed frame)
+	scheduled: 63.919320ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.510208ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 79.510209ms (1649273526394)  (latest completed frame)
+	scheduled: 62.843542ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.417370ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 78.417371ms (1649273526394)  (latest completed frame)
+	scheduled: 61.750704ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.326469ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 77.326470ms (1649273526394)  (latest completed frame)
+	scheduled: 60.659803ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.238565ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 76.238566ms (1649273526394)  (latest completed frame)
+	scheduled: 59.571899ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.142539ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 75.142540ms (1649273526394)  (latest completed frame)
+	scheduled: 58.475873ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.008593ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 74.008594ms (1649273526394)  (latest completed frame)
+	scheduled: 57.341927ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.944242ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 72.944243ms (1649273526394)  (latest completed frame)
+	scheduled: 56.277576ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.879808ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 71.879809ms (1649273526394)  (latest completed frame)
+	scheduled: 55.213142ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.814276ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 70.814277ms (1649273526394)  (latest completed frame)
+	scheduled: 54.147610ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.725320ms (1649223526393) (next time for compositor to pick up frame)
+	progress: 69.725321ms (1649273526394)  (latest completed frame)
+	scheduled: 53.058654ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 35.326064ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 68.659398ms (1649273526394)  (latest completed frame)
+	scheduled: 51.992731ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.242107ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 67.575441ms (1649273526394)  (latest completed frame)
+	scheduled: 50.908774ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.175800ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 66.509134ms (1649273526394)  (latest completed frame)
+	scheduled: 49.842467ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.087401ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 65.420735ms (1649273526394)  (latest completed frame)
+	scheduled: 48.754068ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.992792ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 64.326126ms (1649273526394)  (latest completed frame)
+	scheduled: 47.659459ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.852711ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 63.186045ms (1649273526394)  (latest completed frame)
+	scheduled: 46.519378ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.766158ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 62.099492ms (1649273526394)  (latest completed frame)
+	scheduled: 45.432825ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.657470ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 60.990804ms (1649273526394)  (latest completed frame)
+	scheduled: 44.324137ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.547752ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 59.881086ms (1649273526394)  (latest completed frame)
+	scheduled: 43.214419ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.451678ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 58.785012ms (1649273526394)  (latest completed frame)
+	scheduled: 42.118345ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.309307ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 57.642641ms (1649273526394)  (latest completed frame)
+	scheduled: 40.975974ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.172095ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 56.505429ms (1649273526394)  (latest completed frame)
+	scheduled: 39.838762ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.004450ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 55.337784ms (1649273526394)  (latest completed frame)
+	scheduled: 38.671117ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.921316ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 54.254650ms (1649273526394)  (latest completed frame)
+	scheduled: 37.587983ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.777766ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 53.111100ms (1649273526394)  (latest completed frame)
+	scheduled: 36.444433ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.689342ms (1649240193060) (next time for compositor to pick up frame)
+	progress: 52.022676ms (1649273526394)  (latest completed frame)
+	scheduled: 35.356009ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.284014ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 50.950681ms (1649273526394)  (latest completed frame)
+	scheduled: 34.284014ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.124755ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 49.791422ms (1649273526394)  (latest completed frame)
+	scheduled: 33.124755ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.966853ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 48.633520ms (1649273526394)  (latest completed frame)
+	scheduled: 31.966853ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.810255ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 47.476922ms (1649273526394)  (latest completed frame)
+	scheduled: 30.810255ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 29.723747ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 46.390414ms (1649273526394)  (latest completed frame)
+	scheduled: 29.723747ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.625093ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 45.291760ms (1649273526394)  (latest completed frame)
+	scheduled: 28.625093ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.530589ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 44.197256ms (1649273526394)  (latest completed frame)
+	scheduled: 27.530589ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.459373ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 43.126040ms (1649273526394)  (latest completed frame)
+	scheduled: 26.459373ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.317105ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 41.983772ms (1649273526394)  (latest completed frame)
+	scheduled: 25.317105ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.226841ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 40.893508ms (1649273526394)  (latest completed frame)
+	scheduled: 24.226841ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.112295ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 39.778962ms (1649273526394)  (latest completed frame)
+	scheduled: 23.112295ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.007183ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 38.673850ms (1649273526394)  (latest completed frame)
+	scheduled: 22.007183ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.940060ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 37.606727ms (1649273526394)  (latest completed frame)
+	scheduled: 20.940060ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 19.789982ms (1649256859727) (next time for compositor to pick up frame)
+	progress: 36.456649ms (1649273526394)  (latest completed frame)
+	scheduled: 19.789982ms (1649256859727) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.449950ms (1649273526394) (next time for compositor to pick up frame)
+	progress: 71.449951ms (1649323526395)  (latest completed frame)
+	scheduled: 21.449950ms (1649273526394) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.373020ms (1649273526394) (next time for compositor to pick up frame)
+	progress: 70.373021ms (1649323526395)  (latest completed frame)
+	scheduled: 20.373020ms (1649273526394) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.801838ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 62.135172ms (1649340193062)  (latest completed frame)
+	scheduled: 45.468505ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.686880ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 61.020214ms (1649340193062)  (latest completed frame)
+	scheduled: 44.353547ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.581164ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 59.914498ms (1649340193062)  (latest completed frame)
+	scheduled: 43.247831ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.484876ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 58.818210ms (1649340193062)  (latest completed frame)
+	scheduled: 42.151543ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.417014ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 57.750348ms (1649340193062)  (latest completed frame)
+	scheduled: 41.083681ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.314121ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 56.647455ms (1649340193062)  (latest completed frame)
+	scheduled: 39.980788ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.226378ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 55.559712ms (1649340193062)  (latest completed frame)
+	scheduled: 38.893045ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.073663ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 54.406997ms (1649340193062)  (latest completed frame)
+	scheduled: 37.740330ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.009148ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 53.342482ms (1649340193062)  (latest completed frame)
+	scheduled: 36.675815ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 18.927285ms (1649306859728) (next time for compositor to pick up frame)
+	progress: 52.260619ms (1649340193062)  (latest completed frame)
+	scheduled: 35.593952ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 34.446564ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 51.113231ms (1649340193062)  (latest completed frame)
+	scheduled: 34.446564ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 33.346296ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 50.012963ms (1649340193062)  (latest completed frame)
+	scheduled: 33.346296ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 32.244708ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 48.911375ms (1649340193062)  (latest completed frame)
+	scheduled: 32.244708ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 31.179505ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 47.846172ms (1649340193062)  (latest completed frame)
+	scheduled: 31.179505ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 30.092987ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 46.759654ms (1649340193062)  (latest completed frame)
+	scheduled: 30.092987ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 28.972089ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 45.638756ms (1649340193062)  (latest completed frame)
+	scheduled: 28.972089ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.853583ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 44.520250ms (1649340193062)  (latest completed frame)
+	scheduled: 27.853583ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.763995ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 43.430662ms (1649340193062)  (latest completed frame)
+	scheduled: 26.763995ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.697935ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 42.364602ms (1649340193062)  (latest completed frame)
+	scheduled: 25.697935ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.598059ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 41.264726ms (1649340193062)  (latest completed frame)
+	scheduled: 24.598059ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.532135ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 40.198802ms (1649340193062)  (latest completed frame)
+	scheduled: 23.532135ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.429126ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 39.095793ms (1649340193062)  (latest completed frame)
+	scheduled: 22.429126ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.295593ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 37.962260ms (1649340193062)  (latest completed frame)
+	scheduled: 21.295593ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.203102ms (1649323526395) (next time for compositor to pick up frame)
+	progress: 36.869769ms (1649340193062)  (latest completed frame)
+	scheduled: 20.203102ms (1649323526395) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.568009ms (1649373526396) (next time for compositor to pick up frame)
+	progress: 40.234676ms (1649390193063)  (latest completed frame)
+	scheduled: 23.568009ms (1649373526396) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.490013ms (1649373526396) (next time for compositor to pick up frame)
+	progress: 39.156680ms (1649390193063)  (latest completed frame)
+	scheduled: 22.490013ms (1649373526396) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.413280ms (1649373526396) (next time for compositor to pick up frame)
+	progress: 38.079947ms (1649390193063)  (latest completed frame)
+	scheduled: 21.413280ms (1649373526396) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.345418ms (1649373526396) (next time for compositor to pick up frame)
+	progress: 37.012085ms (1649390193063)  (latest completed frame)
+	scheduled: 20.345418ms (1649373526396) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 27.315676ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 43.982343ms (1649406859730)  (latest completed frame)
+	scheduled: 27.315676ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 26.241770ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 42.908437ms (1649406859730)  (latest completed frame)
+	scheduled: 26.241770ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 25.175034ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 41.841701ms (1649406859730)  (latest completed frame)
+	scheduled: 25.175034ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 24.074788ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 40.741455ms (1649406859730)  (latest completed frame)
+	scheduled: 24.074788ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 23.007379ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 39.674046ms (1649406859730)  (latest completed frame)
+	scheduled: 23.007379ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.940719ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 38.607386ms (1649406859730)  (latest completed frame)
+	scheduled: 21.940719ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.857989ms (1649390193063) (next time for compositor to pick up frame)
+	progress: 37.524656ms (1649406859730)  (latest completed frame)
+	scheduled: 20.857989ms (1649390193063) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] 1649615.967ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1649801.356ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1651734.107ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1651766.334ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1651917.388ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1652434.577ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1652667.701ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1652701.351ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1654050.610ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1654684.621ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1655085.859ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1655366.945ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1655634.715ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1655901.330ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1656384.580ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1656603.504ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1657684.075ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1658769.866ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1658818.937ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1658983.913ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1659284.283ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1659984.385ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1660168.683ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1661285.252ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1666434.946ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1669550.129ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1672968.472ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1675001.281ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1677866.826ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1680184.133ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1689701.407ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1690917.873ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1691516.859ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1692218.301ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1692417.602ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1692451.365ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1692617.740ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1692817.213ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1698750.204ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1701267.967ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1701566.931ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1702150.722ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 50.00ms!
+DEBUG [wait_for_scheduled_free] 1704283.369ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1704885.321ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1704969.203ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1705350.982ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1712551.069ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1712735.212ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1713434.675ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1714033.929ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 100.00ms!
+DEBUG [log_frame_time_diff] Frame late by 33.33ms!
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 22.266299ms (1714723527703) (next time for compositor to pick up frame)
+	progress: 38.932966ms (1714740194370)  (latest completed frame)
+	scheduled: 22.266299ms (1714723527703) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 21.194052ms (1714723527703) (next time for compositor to pick up frame)
+	progress: 37.860719ms (1714740194370)  (latest completed frame)
+	scheduled: 21.194052ms (1714723527703) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] Two frames have completed GPU work and are waiting to be displayed.
+	next frame: 20.117052ms (1714723527703) (next time for compositor to pick up frame)
+	progress: 36.783719ms (1714740194370)  (latest completed frame)
+	scheduled: 20.117052ms (1714723527703) (oldest waiting frame)
+DEBUG [wait_for_scheduled_free] 1727134.730ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1727319.016ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1727416.185ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1727484.264ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1729684.509ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1729916.647ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1729966.971ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1734685.177ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1736534.447ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1744018.922ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1744952.117ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1747383.524ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1749867.633ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1752218.380ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1752466.954ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1759718.913ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1761733.800ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1762918.777ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1766051.379ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1768117.181ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1770119.408ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1772366.647ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1775368.486ms: Dropping old missed frame in favour for completed new frame
+Warning: 178.239734 WM0 Device turned off: 2
+Info: MPFIT stats for WM0:
+Info: 	seed runs         3 / 4189
+Info: 	error failures    0
+DEBUG [wait_for_scheduled_free] 1779218.771ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1779268.404ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1779584.671ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [wait_for_scheduled_free] 1780051.190ms: Dropping old missed frame in favour for completed new frame
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+ INFO [ipc_server_mainloop_poll] Got shutdown signal, shutting down.
+ INFO [shutdown_clients] Disconnecting client (Client 2): libmonado
+ INFO [shutdown_clients] Requesting application Earth exit
+DEBUG [log_frame_time_diff] Frame late by 16.67ms!
+ INFO [client_disconnected] Client 2 disconnected
+DEBUG [wait_for_scheduled_free] 1781818.846ms: Dropping old missed frame in favour for completed new frame
+DEBUG [wait_for_scheduled_free] 1782433.938ms: Dropping old missed frame in favour for completed new frame
+Monado exited with code 9

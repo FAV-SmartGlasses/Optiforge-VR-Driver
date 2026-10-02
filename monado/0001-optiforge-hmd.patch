@@ -1,19 +1,352 @@
-From d4d12c1fe4acac33cc6cab7a379367d637073fb1 Mon Sep 17 00:00:00 2001
+From 8d14cacf0cde60348455c438fc53b6d5dfeb42ad Mon Sep 17 00:00:00 2001
 From: Miky8745 <vanecek.petr@gmail.com>
-Date: Thu, 1 Oct 2026 19:42:17 +0200
+Date: Thu, 1 Oct 2026 20:27:22 +0200
 Subject: [PATCH] Add Optiforge HMD, tracked by a Vive tracker, to the
  lighthouse builder
 
+Also give the XCB compositor window a class, a title and a position hint, so XRT_COMPOSITOR_XCB_DISPLAY works with KWin.
+
+Report devices tracked by libsurvive as not tracked once its poses are more than 100 ms old instead of
+predicting from them forever, and fade the screen to white over 0.5 s while the head isn't tracked, like SteamVR.
 ---
- src/xrt/drivers/CMakeLists.txt                |   4 +
- src/xrt/drivers/optiforge/optiforge_hmd.c     | 458 ++++++++++++++++++
- .../drivers/optiforge/optiforge_interface.h   |  48 ++
- src/xrt/targets/common/CMakeLists.txt         |   1 +
- .../common/target_builder_lighthouse.c        |  32 +-
- 5 files changed, 537 insertions(+), 6 deletions(-)
+ src/xrt/auxiliary/render/render_compute.c         |   2 +
+ src/xrt/auxiliary/render/render_interface.h       |   9 +
+ src/xrt/auxiliary/render/shaders/clear.comp       |   6 +-
+ src/xrt/auxiliary/render/shaders/distortion.comp  |   4 +
+ src/xrt/auxiliary/render/shaders/mesh.frag        |   4 +-
+ src/xrt/auxiliary/render/shaders/mesh.vert        |   4 +
+ src/xrt/compositor/main/comp_renderer.c           |  50 +++
+ src/xrt/compositor/main/comp_window_xcb.c         |  18 +
+ src/xrt/compositor/util/comp_render.h             |   3 +
+ src/xrt/compositor/util/comp_render_cs.c          |   3 +
+ src/xrt/compositor/util/comp_render_gfx.c         |  14 +-
+ src/xrt/drivers/CMakeLists.txt                    |   4 +
+ src/xrt/drivers/optiforge/optiforge_hmd.c         | 465 ++++++++++++++++++++
+ src/xrt/drivers/optiforge/optiforge_interface.h   |  48 ++
+ src/xrt/drivers/survive/survive_driver.c          |  15 +
+ src/xrt/targets/common/CMakeLists.txt             |   1 +
+ .../targets/common/target_builder_lighthouse.c    |  32 +-
+ 17 files changed, 669 insertions(+), 13 deletions(-)
  create mode 100644 src/xrt/drivers/optiforge/optiforge_hmd.c
  create mode 100644 src/xrt/drivers/optiforge/optiforge_interface.h
 
+diff --git a/src/xrt/auxiliary/render/render_compute.c b/src/xrt/auxiliary/render/render_compute.c
+index ff9c97c40..0d2350dfa 100644
+--- a/src/xrt/auxiliary/render/render_compute.c
++++ b/src/xrt/auxiliary/render/render_compute.c
+@@ -303,6 +303,7 @@ dispatch_project_pipeline(struct render_compute *render,
+ 		data->views[i] = views[i];
+ 		data->post_transforms[i] = src_norm_rects[i];
+ 	}
++	data->white_fade = render->white_fade;
+ 
+ 
+ 	/*
+@@ -725,6 +726,7 @@ render_compute_clear(struct render_compute *render,
+ 	for (uint32_t i = 0; i < render->r->view_count; ++i) {
+ 		data->views[i] = views[i];
+ 	}
++	data->white_fade = render->white_fade;
+ 
+ 	/*
+ 	 * Source, target and distortion images.
+diff --git a/src/xrt/auxiliary/render/render_interface.h b/src/xrt/auxiliary/render/render_interface.h
+index b665be428..5e4690f73 100644
+--- a/src/xrt/auxiliary/render/render_interface.h
++++ b/src/xrt/auxiliary/render/render_interface.h
+@@ -913,6 +913,9 @@ struct render_gfx_mesh_ubo_data
+ 	struct xrt_normalized_rect pre_transform;
+ 	struct xrt_matrix_4x4 transform_scanout_begin;
+ 	struct xrt_matrix_4x4 transform_scanout_end;
++
++	//! How much the output is faded to white, 0 to 1.
++	float white_fade;
+ };
+ 
+ /*!
+@@ -1198,6 +1201,9 @@ struct render_compute
+ 	 * @ref render_compute_projection, and @ref render_compute_clear.
+ 	 */
+ 	VkDescriptorSet shared_descriptor_set;
++
++	//! How much the clear and distortion shaders fade the output to white, 0 to 1.
++	float white_fade;
+ };
+ 
+ /*!
+@@ -1377,6 +1383,9 @@ struct render_compute_distortion_ubo_data
+ 	struct xrt_normalized_rect post_transforms[XRT_MAX_VIEWS];
+ 	struct xrt_matrix_4x4 transform_timewarp_scanout_begin[XRT_MAX_VIEWS];
+ 	struct xrt_matrix_4x4 transform_timewarp_scanout_end[XRT_MAX_VIEWS];
++
++	//! How much the output is faded to white, 0 to 1.
++	float white_fade;
+ };
+ 
+ /*!
+diff --git a/src/xrt/auxiliary/render/shaders/clear.comp b/src/xrt/auxiliary/render/shaders/clear.comp
+index 1f0e732b8..33295e1bf 100644
+--- a/src/xrt/auxiliary/render/shaders/clear.comp
++++ b/src/xrt/auxiliary/render/shaders/clear.comp
+@@ -16,7 +16,9 @@ layout(set = 0, binding = 3) uniform restrict Config
+ 	ivec4 views[2];
+ 	vec4 pre_transform[2];
+ 	vec4 post_transform[2];
+-	mat4 transform[2];
++	mat4 transform_timewarp_scanout_begin[2];
++	mat4 transform_timewarp_scanout_end[2];
++	float white_fade;
+ } data;
+ 
+ 
+@@ -33,7 +35,7 @@ void main()
+ 		return;
+ 	}
+ 
+-	vec4 colour = vec4(0, 0, 0, 1.0);
++	vec4 colour = vec4(vec3(data.white_fade), 1.0);
+ 
+ 	imageStore(target, ivec2(offset.x + ix, offset.y + iy), colour);
+ }
+diff --git a/src/xrt/auxiliary/render/shaders/distortion.comp b/src/xrt/auxiliary/render/shaders/distortion.comp
+index 075e1fff5..54bb16581 100644
+--- a/src/xrt/auxiliary/render/shaders/distortion.comp
++++ b/src/xrt/auxiliary/render/shaders/distortion.comp
+@@ -29,6 +29,7 @@ layout(set = 0, binding = 3, std140) uniform restrict Config
+ 	vec4 post_transform[2];
+ 	mat4 transform_timewarp_scanout_begin[2];
+ 	mat4 transform_timewarp_scanout_end[2];
++	float white_fade;
+ }ubo;
+ 
+ 
+@@ -138,5 +139,8 @@ void main()
+ 	// Do colour correction here since there are no automatic conversion in hardware available.
+ 	colour = vec4(from_linear_to_srgb(colour.rgb), 1);
+ 
++	// Fade to white while the head isn't tracked.
++	colour.rgb = mix(colour.rgb, vec3(1.0), ubo.white_fade);
++
+ 	imageStore(target, ivec2(offset.x + ix, offset.y + iy), colour);
+ }
+diff --git a/src/xrt/auxiliary/render/shaders/mesh.frag b/src/xrt/auxiliary/render/shaders/mesh.frag
+index 242c6d560..ac56a8ba9 100644
+--- a/src/xrt/auxiliary/render/shaders/mesh.frag
++++ b/src/xrt/auxiliary/render/shaders/mesh.frag
+@@ -15,6 +15,7 @@ layout (binding = 0) uniform sampler2D tex_sampler;
+ layout (location = 0)  in vec2 in_ruv;
+ layout (location = 1)  in vec2 in_guv;
+ layout (location = 2)  in vec2 in_buv;
++layout (location = 3) flat in float in_white_fade;
+ layout (location = 0) out vec4 out_color;
+ 
+ 
+@@ -24,5 +25,6 @@ void main()
+ 	float g = texture(tex_sampler, in_guv).y;
+ 	float b = texture(tex_sampler, in_buv).z;
+ 
+-	out_color = vec4(r, g, b, 1.0);
++	// Fade to white while the head isn't tracked.
++	out_color = vec4(mix(vec3(r, g, b), vec3(1.0), in_white_fade), 1.0);
+ }
+diff --git a/src/xrt/auxiliary/render/shaders/mesh.vert b/src/xrt/auxiliary/render/shaders/mesh.vert
+index f31e1be8a..cb5123672 100644
+--- a/src/xrt/auxiliary/render/shaders/mesh.vert
++++ b/src/xrt/auxiliary/render/shaders/mesh.vert
+@@ -18,6 +18,8 @@ layout (binding = 1, std140) uniform Config
+ 	vec4 pre_transform;
+ 	mat4 transform_scanout_begin;
+ 	mat4 transform_scanout_end;
++
++	float white_fade;
+ } ubo;
+ 
+ layout (location = 0)  in vec4 in_pos_ruv;
+@@ -25,6 +27,7 @@ layout (location = 1)  in vec4 in_guv_buv;
+ layout (location = 0) out vec2 out_r_uv;
+ layout (location = 1) out vec2 out_g_uv;
+ layout (location = 2) out vec2 out_b_uv;
++layout (location = 3) flat out float out_white_fade;
+ 
+ out gl_PerVertex
+ {
+@@ -98,4 +101,5 @@ void main()
+ 	out_r_uv = r_uv;
+ 	out_g_uv = g_uv;
+ 	out_b_uv = b_uv;
++	out_white_fade = ubo.white_fade;
+ }
+diff --git a/src/xrt/compositor/main/comp_renderer.c b/src/xrt/compositor/main/comp_renderer.c
+index 9250e05f2..6a70e729b 100644
+--- a/src/xrt/compositor/main/comp_renderer.c
++++ b/src/xrt/compositor/main/comp_renderer.c
+@@ -55,6 +55,9 @@
+ DEBUG_GET_ONCE_LOG_OPTION(comp_frame_lag_level, "XRT_COMP_FRAME_LAG_LOG_AS_LEVEL", U_LOGGING_WARN)
+ #define LOG_FRAME_LAG(...) U_LOG_IFL(debug_get_log_option_comp_frame_lag_level(), u_log_get_global_level(), __VA_ARGS__)
+ 
++//! How long fading to white and back takes when head tracking is lost and found again.
++#define WHITE_FADE_DURATION_NS (500 * U_TIME_1MS_IN_NS)
++
+ /*
+  *
+  * Helper macros for adding semaphores to lists.
+@@ -128,6 +131,12 @@ struct comp_renderer
+ 
+ 	struct comp_mirror_to_debug_gui mirror_to_debug_gui;
+ 
++	//! How much the output is faded to white, 0 to 1, see @ref update_white_fade.
++	float white_fade;
++
++	//! Display time of the frame the white fade was last updated for.
++	int64_t white_fade_last_ns;
++
+ 	//! @}
+ 
+ 	//! @name Image-dependent members
+@@ -317,6 +326,44 @@ calc_scanout_compensation_ns(struct comp_renderer *r)
+ 	return 0;
+ }
+ 
++//! Is the head orientation not tracked at the time the frame being rendered is displayed?
++static bool
++is_head_tracking_lost(struct comp_renderer *r)
++{
++	struct xrt_space_relation head_relation = XRT_SPACE_RELATION_ZERO;
++	xrt_result_t xret = xrt_device_get_tracked_pose(     //
++	    r->c->xdev,                                      //
++	    XRT_INPUT_GENERIC_HEAD_POSE,                     //
++	    r->c->frame.rendering.predicted_display_time_ns, // at_timestamp_ns
++	    &head_relation);                                 //
++	if (xret != XRT_SUCCESS) {
++		return false;
++	}
++
++	return (head_relation.relation_flags & XRT_SPACE_RELATION_ORIENTATION_TRACKED_BIT) == 0;
++}
++
++//! Step the white fade towards white while the head isn't tracked and back otherwise, returns the new fade.
++static float
++update_white_fade(struct comp_renderer *r)
++{
++	int64_t now_ns = r->c->frame.rendering.predicted_display_time_ns;
++	int64_t delta_ns = r->white_fade_last_ns != 0 ? now_ns - r->white_fade_last_ns : 0;
++	r->white_fade_last_ns = now_ns;
++
++	// Ignore time going backwards, and don't jump over the whole fade after a stall.
++	delta_ns = CLAMP(delta_ns, 0, WHITE_FADE_DURATION_NS / 10);
++	float step = (float)delta_ns / (float)WHITE_FADE_DURATION_NS;
++
++	if (is_head_tracking_lost(r)) {
++		r->white_fade = MIN(r->white_fade + step, 1.0f);
++	} else {
++		r->white_fade = MAX(r->white_fade - step, 0.0f);
++	}
++
++	return r->white_fade;
++}
++
+ static void
+ calc_pose_data(struct comp_renderer *r,
+                enum comp_target_fov_source fov_source,
+@@ -1144,6 +1191,9 @@ comp_renderer_draw(struct comp_renderer *r)
+ 	    fast_path,        //
+ 	    &c->scratch);     //
+ 
++	// A frozen head pose makes people sick, fade to white instead, like SteamVR.
++	frame_state.data.white_fade = update_white_fade(r);
++
+ 	bool use_compute = r->settings->use_compute;
+ 	struct render_gfx render_g = {0};
+ 	struct render_compute render_c = {0};
+diff --git a/src/xrt/compositor/main/comp_window_xcb.c b/src/xrt/compositor/main/comp_window_xcb.c
+index 727d71fe3..458b318f3 100644
+--- a/src/xrt/compositor/main/comp_window_xcb.c
++++ b/src/xrt/compositor/main/comp_window_xcb.c
+@@ -328,6 +328,24 @@ comp_window_xcb_create_window(struct comp_window_xcb *w, VkExtent2D extent)
+ 	    w->screen->root_visual,        // visual
+ 	    XCB_CW_EVENT_MASK,             // value_mask
+ 	    &value_list);                  // value_list
++
++	// Window class (instance and class, NUL separated) and title, so window managers can match the window.
++	static const char wm_class[] = "monado\0Monado";
++	xcb_change_property(w->connection, XCB_PROP_MODE_REPLACE, w->window, XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, 8,
++	                    sizeof(wm_class), wm_class);
++	xcb_change_property(w->connection, XCB_PROP_MODE_REPLACE, w->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
++	                    strlen("Monado"), "Monado");
++
++	if (w->base.base.c->settings.fullscreen) {
++		// WM_SIZE_HINTS with USPosition | PPosition, so the window manager keeps the window on the selected
++		// display instead of placing it on the active one: flags, x, y, then the unused fields.
++		uint32_t size_hints[18] = {0};
++		size_hints[0] = (1 << 0) | (1 << 2);
++		size_hints[1] = (uint32_t)x;
++		size_hints[2] = (uint32_t)y;
++		xcb_change_property(w->connection, XCB_PROP_MODE_REPLACE, w->window, XCB_ATOM_WM_NORMAL_HINTS,
++		                    XCB_ATOM_WM_SIZE_HINTS, 32, 18, size_hints);
++	}
+ }
+ 
+ static void
+diff --git a/src/xrt/compositor/util/comp_render.h b/src/xrt/compositor/util/comp_render.h
+index eabea2076..66c3b64fc 100644
+--- a/src/xrt/compositor/util/comp_render.h
++++ b/src/xrt/compositor/util/comp_render.h
+@@ -186,6 +186,9 @@ struct comp_render_dispatch_data
+ 	//! Very often true, can be disabled for debugging.
+ 	bool do_timewarp;
+ 
++	//! How much the output is faded to white, 0 to 1. Goes up while the head isn't tracked, like SteamVR does.
++	float white_fade;
++
+ 	struct
+ 	{
+ 		//! Has this struct been setup to use the target.
+diff --git a/src/xrt/compositor/util/comp_render_cs.c b/src/xrt/compositor/util/comp_render_cs.c
+index b68def90e..ba7775b36 100644
+--- a/src/xrt/compositor/util/comp_render_cs.c
++++ b/src/xrt/compositor/util/comp_render_cs.c
+@@ -827,6 +827,9 @@ comp_render_cs_dispatch(struct render_compute *render,
+ 		return;
+ 	}
+ 
++	// Used by the clear and distortion shaders.
++	render->white_fade = d->white_fade;
++
+ 	// Convenience.
+ 	bool fast_path = d->fast_path;
+ 
+diff --git a/src/xrt/compositor/util/comp_render_gfx.c b/src/xrt/compositor/util/comp_render_gfx.c
+index dd4c644b0..01704ae55 100644
+--- a/src/xrt/compositor/util/comp_render_gfx.c
++++ b/src/xrt/compositor/util/comp_render_gfx.c
+@@ -496,10 +496,15 @@ do_quad_layer(struct render_gfx *render,
+ static void
+ crg_clear_output(struct render_gfx *render, const struct comp_render_dispatch_data *d)
+ {
+-	render_gfx_begin_target(     //
+-	    render,                  //
+-	    d->target.gfx.rtr,       //
+-	    &background_color_idle); //
++	// Idle is black, faded to white while the head isn't tracked.
++	const VkClearColorValue color = {
++	    .float32 = {d->white_fade, d->white_fade, d->white_fade, 1.0f},
++	};
++
++	render_gfx_begin_target( //
++	    render,              //
++	    d->target.gfx.rtr,   //
++	    &color);             //
+ 
+ 	render_gfx_end_target(render);
+ }
+@@ -533,6 +538,7 @@ crg_distortion_common(struct render_gfx *render,
+ 		struct render_gfx_mesh_ubo_data data = {
+ 		    .vertex_rot = d->views[i].target.gfx.vertex_rot,
+ 		    .post_transform = md->views[i].src_norm_rect,
++		    .white_fade = d->white_fade,
+ 		};
+ 
+ 		// Extra arguments for timewarp.
 diff --git a/src/xrt/drivers/CMakeLists.txt b/src/xrt/drivers/CMakeLists.txt
 index 5ec99108b..4319ac3ac 100644
 --- a/src/xrt/drivers/CMakeLists.txt
@@ -31,10 +364,10 @@ index 5ec99108b..4319ac3ac 100644
  		drv_wmr STATIC
 diff --git a/src/xrt/drivers/optiforge/optiforge_hmd.c b/src/xrt/drivers/optiforge/optiforge_hmd.c
 new file mode 100644
-index 000000000..b47dacd7d
+index 000000000..b776bb73a
 --- /dev/null
 +++ b/src/xrt/drivers/optiforge/optiforge_hmd.c
-@@ -0,0 +1,458 @@
+@@ -0,0 +1,465 @@
 +// Copyright 2026, Optiforge.
 +// SPDX-License-Identifier: BSL-1.0
 +/*!
@@ -324,7 +657,8 @@ index 000000000..b47dacd7d
 +		return XRT_ERROR_INPUT_UNSUPPORTED;
 +	}
 +
-+	struct xrt_space_relation tracker_relation;
++	// The survive driver leaves this untouched until libsurvive has created the tracker.
++	struct xrt_space_relation tracker_relation = XRT_SPACE_RELATION_ZERO;
 +	xrt_result_t xret = xrt_device_get_tracked_pose( //
 +	    hmd->tracker,                                //
 +	    XRT_INPUT_GENERIC_TRACKER_POSE,              //
@@ -332,6 +666,12 @@ index 000000000..b47dacd7d
 +	    &tracker_relation);                          //
 +	if (xret != XRT_SUCCESS) {
 +		return xret;
++	}
++
++	// No pose at all yet, the orientation would be a zero quaternion.
++	if ((tracker_relation.relation_flags & XRT_SPACE_RELATION_ORIENTATION_VALID_BIT) == 0) {
++		*out_relation = (struct xrt_space_relation)XRT_SPACE_RELATION_ZERO;
++		return XRT_SUCCESS;
 +	}
 +
 +	// Head rotation = tracker rotation * head-relative-to-tracker rotation, then the inverted axes.
@@ -547,6 +887,39 @@ index 000000000..c04d0aa9f
 +#ifdef __cplusplus
 +}
 +#endif
+diff --git a/src/xrt/drivers/survive/survive_driver.c b/src/xrt/drivers/survive/survive_driver.c
+index 09c22b5a0..d02cc39f5 100644
+--- a/src/xrt/drivers/survive/survive_driver.c
++++ b/src/xrt/drivers/survive/survive_driver.c
+@@ -61,6 +61,9 @@ DEBUG_GET_ONCE_BOOL_OPTION(survive_default_ipd, "SURVIVE_DEFAULT_IPD", false)
+ DEBUG_GET_ONCE_FLOAT_OPTION(survive_timecode_offset_ms, "SURVIVE_TIMECODE_OFFSET_MS", 0.0)
+ DEBUG_GET_ONCE_FLOAT_OPTION(survive_override_ipd, "SURVIVE_OVERRIDE_IPD_MM", -1.0f)
+ 
++//! How far past the newest libsurvive pose we predict before reporting the device as not tracked.
++#define SURVIVE_MAX_PREDICTION_NS (100 * U_TIME_1MS_IN_NS)
++
+ 
+ static void
+ survive_device_destroy(struct xrt_device *xdev)
+@@ -235,6 +238,18 @@ survive_device_get_tracked_pose(struct xrt_device *xdev,
+ 	struct xrt_space_relation space_relation;
+ 	m_relation_history_get(survive->relation_hist, at_timestamp_ns, &space_relation);
+ 
++	// libsurvive stops sending poses when it loses optical tracking. Predicting from the last pose with its
++	// velocity would then spin or slide forever, so hold the last pose and report it as not tracked.
++	int64_t latest_timestamp_ns = 0;
++	struct xrt_space_relation latest_relation;
++	if (m_relation_history_get_latest(survive->relation_hist, &latest_timestamp_ns, &latest_relation) &&
++	    at_timestamp_ns - latest_timestamp_ns > SURVIVE_MAX_PREDICTION_NS) {
++		space_relation = latest_relation;
++		space_relation.relation_flags &=
++		    ~(XRT_SPACE_RELATION_ORIENTATION_TRACKED_BIT | XRT_SPACE_RELATION_POSITION_TRACKED_BIT |
++		      XRT_SPACE_RELATION_LINEAR_VELOCITY_VALID_BIT | XRT_SPACE_RELATION_ANGULAR_VELOCITY_VALID_BIT);
++	}
++
+ 	struct xrt_relation_chain relation_chain = {0};
+ 	m_relation_chain_push_pose(&relation_chain, &pose_offset);
+ 	m_relation_chain_push_relation(&relation_chain, &space_relation);
 diff --git a/src/xrt/targets/common/CMakeLists.txt b/src/xrt/targets/common/CMakeLists.txt
 index f3f46c911..6c62d974a 100644
 --- a/src/xrt/targets/common/CMakeLists.txt
